@@ -34,7 +34,7 @@ namespace nodegui {
 
   Napi::Value GUIFrame::flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    renderer->gpu_context()->immediate_context()->Flush();
+    renderer->Flush();
     return env.Undefined();
   }
 
@@ -55,10 +55,12 @@ namespace nodegui {
     HRESULT hr = S_OK;
     ComPtr<IDXGIResource1> resource;
 
-    renderer->gpu_context()->immediate_context()->Flush();
+    renderer->Flush();
+
+    ul::GPUDriverD3D11* gpu_driver = (ul::GPUDriverD3D11*) renderer->gpu_driver();
 
     uint32_t id = renderer->view()->render_target().render_buffer_id;
-    hr = renderer->gpu_driver()->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
+    hr = gpu_driver->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
     if FAILED(hr) {
       MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to query interface", (LPCWSTR)L"D3D11 Error", MB_OK);
       return env.Undefined();

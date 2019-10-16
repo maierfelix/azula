@@ -20,20 +20,15 @@ namespace nodegui {
     GUIRendererD3D11(GUIFrame* frame);
     ~GUIRendererD3D11() {};
 
-    void Update() override;
-    void Render() override;
-    void UpdateGeometry() override;
+    virtual void Flush() override;
+    virtual void BeginDrawing() override;
+    virtual void EndDrawing() override;
 
     ul::GPUContextD3D11* gpu_context();
-    ul::GPUDriverD3D11* gpu_driver();
 
   private:
     std::unique_ptr<ul::GPUContextD3D11> gpu_context_;
-    std::unique_ptr<ul::GPUDriverD3D11> gpu_driver_;
-
     ul::Config config;
-    std::unique_ptr<ul::FontLoader> font_loader;
-    std::unique_ptr<ul::FileSystem> file_system;
 
     uint32_t geometry_id;
     std::vector<ul::Vertex_2f_4ub_2f_2f_28f> vertices;

@@ -7,7 +7,7 @@
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 
-#include "GUIRendererD3D11.h"
+#include "GUIRenderer.h"
 
 #include "utils.h"
 
@@ -64,7 +64,7 @@ namespace nodegui {
     GUIFrame(const Napi::CallbackInfo &info);
     ~GUIFrame();
   private:
-    std::unique_ptr<GUIRendererD3D11> renderer;
+    std::unique_ptr<GUIRenderer> renderer;
 
   };
 }
