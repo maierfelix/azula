@@ -18,6 +18,7 @@
       "sources": [
         "./src/GUIFrame.cpp",
         "./src/GUIRenderer.cpp",
+        "./src/GUIRendererD3D11.cpp",
         "./src/FileSystemWin.cpp",
         "./src/FontLoaderWin.cpp",
         "./src/GPUDriverD3D11.cpp",
@@ -59,8 +60,7 @@
               "WIN32_LEAN_AND_MEAN",
               "VC_EXTRALEAN",
               "_HAS_EXCEPTIONS=1",
-              "NOMINMAX",
-              "_WIN32_WINNT=0x0601"
+              "NOMINMAX"
             ],
             "msvs_configuration_attributes": {
               "CharacterSet": "Unicode"

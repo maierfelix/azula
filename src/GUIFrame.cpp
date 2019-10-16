@@ -2,7 +2,7 @@
 #include <napi.h>
 
 #include "GUIFrame.h"
-#include "GUIRenderer.h"
+#include "GUIRendererD3D11.h"
 
 namespace ul = ultralight;
 
@@ -12,7 +12,7 @@ namespace nodegui {
 
   GUIFrame::GUIFrame(const Napi::CallbackInfo& info) :
     Napi::ObjectWrap<GUIFrame>(info),
-    renderer(std::make_unique<GUIRenderer>(this)),
+    renderer(std::make_unique<GUIRendererD3D11>(this)),
     env_(info.Env()) {
 
   }
@@ -34,7 +34,7 @@ namespace nodegui {
 
   Napi::Value GUIFrame::flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    renderer->gpu_context->immediate_context()->Flush();
+    renderer->gpu_context()->immediate_context()->Flush();
     return env.Undefined();
   }
 
@@ -45,7 +45,7 @@ namespace nodegui {
       return env.Undefined();
     }
     std::string html = info[0].As<Napi::String>().Utf8Value();
-    renderer->view->LoadHTML(html.c_str());
+    renderer->view()->LoadHTML(html.c_str());
     return env.Undefined();
   }
 
@@ -55,10 +55,10 @@ namespace nodegui {
     HRESULT hr = S_OK;
     ComPtr<IDXGIResource1> resource;
 
-    renderer->gpu_context->immediate_context()->Flush();
+    renderer->gpu_context()->immediate_context()->Flush();
 
-    uint32_t id = renderer->view->render_target().render_buffer_id;
-    hr = renderer->gpu_driver->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
+    uint32_t id = renderer->view()->render_target().render_buffer_id;
+    hr = renderer->gpu_driver()->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
     if FAILED(hr) {
       MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to query interface", (LPCWSTR)L"D3D11 Error", MB_OK);
       return env.Undefined();
@@ -135,7 +135,7 @@ namespace nodegui {
       Napi::Error::New(env, "Invalid event type").ThrowAsJavaScriptException();
       return env.Undefined();
     }
-    renderer->view->FireMouseEvent(evt);
+    renderer->view()->FireMouseEvent(evt);
     return env.Undefined();
   }
 
@@ -155,7 +155,7 @@ namespace nodegui {
       return env.Undefined();
     }
     evt.virtual_key_code = GLFWKeyCodeToUltralightKeyCode(keyCode);
-    renderer->view->FireKeyEvent(evt);
+    renderer->view()->FireKeyEvent(evt);
     return env.Undefined();
   }
 
@@ -167,7 +167,7 @@ namespace nodegui {
     evt.delta_x = info[1].As<Napi::Number>().Uint32Value();
     evt.delta_y = info[2].As<Napi::Number>().Uint32Value();
 
-    renderer->view->FireScrollEvent(evt);
+    renderer->view()->FireScrollEvent(evt);
     return env.Undefined();
   }
 
