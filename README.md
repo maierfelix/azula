@@ -46,7 +46,33 @@ You can now import *azula* into your project:
 const azula = require("azula");
 ````
 
+Or with *ESM*:
+````js
+import azula from "azula";
+````
 ## API
+
+  * [Window](#window)
+    - [General](#)
+      - [title](#windowprototypetitle)
+      - [update](#windowprototypeupdate)
+      - [flush](#windowprototypeflush)
+    - [Loading](#)
+      - [loadHTML](#windowprototypeloadhtml)
+      - [loadFile](#windowprototypeloadfile)
+    - [Events](#)
+      - [onresize](#windowprototypeonresize)
+      - [oncursorchange](#windowprototypeoncursorchange)
+      - [onconsolemessage](#windowprototypeonconsolemessage)
+    - [Event Dispatching](#)
+      - [dispatchMouseEvent](#windowprototypedispatchmouseevent)
+      - [dispatchKeyEvent](#windowprototypedispatchkeyevent)
+      - [dispatchScrollEvent](#windowprototypedispatchscrollevent)
+    - [Binary Messaging](#)
+      - [dispatchBinaryBuffer](#windowprototypedispatchbinarybuffer)
+      - [onbinarymessage](#windowprototypeonbinarymessage)
+    - [OSR](#)
+      - [getSharedHandleD3D11](#windowprototypegetsharedhandled3d11)
 
 ## Window
 
