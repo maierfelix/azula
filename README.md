@@ -34,11 +34,9 @@
 | <img src="https://i.imgur.com/bkBCY7V.png" alt="" height="16px">  Linux         | ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ In Progress ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌|
 | <img src="https://i.imgur.com/iPt4GHz.png" alt="" height="16px">  MacOS         | ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ In Progress ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌|
 
-## API
+## Getting Started
 
-### Getting Started
-
-At first, install azula using:
+Install azula using:
 ````
 npm install azula
 ````
@@ -47,6 +45,8 @@ You can now import *azula* into your project:
 ````js
 const azula = require("azula");
 ````
+
+## API
 
 ### Window
 
