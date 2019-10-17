@@ -20,9 +20,9 @@
 
 #
 
-*azula* is a lightweight GPU accelerated HTML GUI for Node. This project uses [Ultralight](https://github.com/ultralight-ux/Ultralight), which is a Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
+*azula* is a lightweight GPU accelerated HTML GUI for Node. This project uses [Ultralight](https://github.com/ultralight-ux/Ultralight), which is an embedding friendly Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
 
-*azula* supports running in [OSR](#OSR) mode, which makes it easy to embed *azula* in existing projects as a GUI solution.
+*azula* can optionally run in [OSR](#OSR) mode, which makes it easy to embed *azula* in low-level JavaScript projects.
 
 ## Platforms
 
@@ -56,15 +56,47 @@ When creating a new Window, the following parameters are available:
 | :--- | :--- | :--- |
 | width | *Number* | The initial width of the window |
 | height | *Number* | The initial height of the window |
+| title | *String* | The initial title of the window |
 | useOffscreenRendering | *Boolean* | Creates the window in [OSR mode](#OSR) |
 
-Example:
 ````js
 let window = new azula.Window({
   width: 480,
   height: 320,
+  title: "My App",
   useOffscreenRendering: false
 });
+````
+
+#### title
+
+| Type | Description |
+| :--- | :--- |
+| *String* | A getter/setter allowing to retrieve or update the title of the window |
+
+````js
+window.title = "My App";
+window.title; // "My App"
+````
+
+#### loadHTML
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| html | *String* | String representation of the HTML to load |
+
+````js
+window.loadHTML("<button>Hello World!</button>");
+````
+
+#### loadFile
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| path | *String* | The path from where the content gets read from |
+
+````js
+window.loadFile("./index.html");
 ````
 
 ### OSR
