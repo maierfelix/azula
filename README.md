@@ -57,7 +57,7 @@ When creating a new Window, the following parameters are available:
 | width | *Number* | The initial width of the window |
 | height | *Number* | The initial height of the window |
 | title | *String* | The initial title of the window |
-| useOffscreenRendering | *Boolean* | Creates the window in [OSR mode](#OSR) |
+| useOffscreenRendering | *Boolean* | When *true*, creates the window in [OSR mode](#osr) |
 
 ````js
 let window = new azula.Window({
