@@ -356,7 +356,7 @@ On **Windows**, you can request a shared HANDLE using the Window's [getSharedHan
 
 ## License
 
-Azula is MIT licensed, while [Ultralight](https://github.com/ultralight-ux/Ultralight/tree/master/license) comes with the following License:
+Azula is MIT licensed, while [Ultralight](https://github.com/ultralight-ux/Ultralight) comes with the following License:
 
 ````
 Ultralight is free for non-commercial use, educational use, 
@@ -365,4 +365,4 @@ less than US$100,000 a year. You can find full terms in the SDK.
 Pricing plans for larger commercial projects will be announced later.
 ````
 
-For further information regaring the licensing of Ultralight, see [this](https://github.com/ultralight-ux/Ultralight) link.
+For further information regaring the licensing of Ultralight, see [this](https://github.com/ultralight-ux/Ultralight/tree/master/license) link.
