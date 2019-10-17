@@ -68,7 +68,7 @@ let window = new azula.Window({
 });
 ````
 
-#### title
+#### Window.prototype.title
 
 | Type | Description |
 | :--- | :--- |
@@ -79,7 +79,7 @@ window.title = "My App";
 window.title; // "My App"
 ````
 
-#### loadHTML
+#### Window.prototype.loadHTML
 
 | name | Type | Description |
 | :--- | :--- | :--- |
@@ -89,7 +89,7 @@ window.title; // "My App"
 window.loadHTML("<button>Hello World!</button>");
 ````
 
-#### loadFile
+#### Window.prototype.loadFile
 
 | name | Type | Description |
 | :--- | :--- | :--- |
