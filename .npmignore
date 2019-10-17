@@ -1,5 +1,6 @@
 build/Debug/*
 
+build/.vs
 build/*.lib
 build/Release/obj
 build/Release/*.iobj
