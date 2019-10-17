@@ -95,3 +95,5 @@ third_party/*/bin/*/*/*.ipdb
 third_party/*/bin/*/*/*.pdb
 third_party/*/bin/*/*/*.map
 third_party/*/bin/*/*/obj.target
+
+package-lock.json

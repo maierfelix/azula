@@ -22,7 +22,6 @@ namespace nodegui {
     Napi::Env env_;
 
     Napi::Value Update(const Napi::CallbackInfo &info);
-    Napi::Value Render(const Napi::CallbackInfo &info);
     Napi::Value Flush(const Napi::CallbackInfo &info);
 
     Napi::Value GetTitle(const Napi::CallbackInfo &info);

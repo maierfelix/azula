@@ -36,6 +36,14 @@ namespace nodegui {
     else {
       renderer = std::make_unique<GUIRenderer>(this);
     }
+
+    // we can only change the title after creating the renderer (bc Im a lazy piece of shit)
+    if (info[0].IsObject()) {
+      Napi::Object opts = info[0].As<Napi::Object>();
+      if (opts.Has("title")) {
+        renderer->SetTitle(opts.Get("title").As<Napi::String>().Utf8Value());
+      }
+    }
   }
   GUIFrame::~GUIFrame() {
 
@@ -47,14 +55,9 @@ namespace nodegui {
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::Render(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-    renderer->Render();
-    return env.Undefined();
-  }
-
   Napi::Value GUIFrame::Flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
+    renderer->Render();
     renderer->Flush();
     return env.Undefined();
   }
@@ -226,9 +229,9 @@ namespace nodegui {
   void GUIFrame::OnChangeCursor(ul::View* caller, ul::Cursor cursor) {
     if (oncursorchange.IsEmpty()) return;
     Napi::Env env = env_;
-    oncursorchange.Value().As<Napi::Function>().Call({
-      Napi::String::New(env, UlCursorToString(cursor))
-    });
+    Napi::Object out = Napi::Object::New(env);
+    out.Set("name", Napi::String::New(env, UlCursorToString(cursor)));
+    oncursorchange.Value().As<Napi::Function>().Call({ out });
   }
 
   void GUIFrame::OnAddConsoleMessage(
@@ -361,16 +364,11 @@ namespace nodegui {
 
   Napi::Object GUIFrame::Initialize(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GUIFrame", {
+    Napi::Function func = DefineClass(env, "Window", {
       // methods
       InstanceMethod(
         "update",
         &GUIFrame::Update,
-        napi_enumerable
-      ),
-      InstanceMethod(
-        "render",
-        &GUIFrame::Render,
         napi_enumerable
       ),
       InstanceMethod(
@@ -443,7 +441,7 @@ namespace nodegui {
     });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
-    exports.Set("GUIFrame", func);
+    exports.Set("Window", func);
     return exports;
   }
 

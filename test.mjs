@@ -1,12 +1,11 @@
 import fs from "fs";
 import nvk from "nvk";
-import addon from "./index.js";
+import azula from "./index.js";
 import essentials from "nvk-essentials";
 
 const {GLSL} = essentials;
 
 Object.assign(global, nvk);
-Object.assign(global, addon);
 
 function ASSERT_VK_RESULT(result) {
   if (result !== VK_SUCCESS) {
@@ -41,58 +40,58 @@ let win = new VulkanWindow({
   title: "NVK GUI"
 });
 
-let frame = new addon.GUIFrame({
+let gui = new azula.Window({
   useOffscreenRendering: true
 });
 
-let handleWin32 = frame.getSharedHandleD3D11();
+let handleWin32 = gui.getSharedHandleD3D11();
 
 // forward window mouse events to GUI
 let currentButton = -1;
 win.onmousemove = e => {
-  frame.dispatchMouseEvent("onmousemove", e.x, e.y, currentButton);
+  gui.dispatchMouseEvent("onmousemove", e.x, e.y, currentButton);
 };
 win.onmousedown = e => {
   currentButton = e.button;
-  frame.dispatchMouseEvent("onmousedown", e.x, e.y, e.button);
+  gui.dispatchMouseEvent("onmousedown", e.x, e.y, e.button);
 };
 win.onmouseup = e => {
   currentButton = -1;
-  frame.dispatchMouseEvent("onmouseup", e.x, e.y, e.button);
+  gui.dispatchMouseEvent("onmouseup", e.x, e.y, e.button);
 };
 win.onmousewheel = e => {
-  frame.dispatchScrollEvent("onmousewheel", e.deltaX, e.deltaY);
+  gui.dispatchScrollEvent("onmousewheel", e.deltaX, e.deltaY);
 };
 
 // forward window key events to GUI
 win.onkeydown = e => {
-  frame.dispatchKeyEvent("onkeydown", e.keyCode);
+  gui.dispatchKeyEvent("onkeydown", e.keyCode);
 };
 win.onkeyup = e => {
-  frame.dispatchKeyEvent("onkeyup", e.keyCode);
+  gui.dispatchKeyEvent("onkeyup", e.keyCode);
 };
 
 // forward GUI cursor change event to window
-frame.oncursorchange = e => {
+gui.oncursorchange = e => {
   //console.log("Cursor:", e);
 };
 
 // forwards GUI console calls to node CLI
-frame.onconsolemessage = e => {
+gui.onconsolemessage = e => {
   let message = e.message;
   let loc = `at ${e.source ? e.source + ":" : ""}${e.location.line}:${e.location.column}`;
   e.callee.apply(console, [e.message, loc]);
 };
 
-frame.onbinarymessage = (buffer, args) => {
+gui.onbinarymessage = (buffer, args) => {
   setTimeout(() => {
     args.kind = 666;
     console.log(buffer);
-    frame.dispatchBinaryBuffer(buffer, args);
+    gui.dispatchBinaryBuffer(buffer, args);
   }, 1e3);
 };
 
-frame.loadHTML(`
+gui.loadHTML(`
   <style>
     body {
       background: rgba(255,255,255,1.0);
@@ -145,7 +144,7 @@ frame.loadHTML(`
   };
   </script>
 `);
-frame.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
+gui.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
 
 let device = new VkDevice();
 let instance = new VkInstance();
@@ -776,9 +775,8 @@ function drawFrame() {
 (function drawLoop() {
   win.pollEvents();
   let result = drawFrame();
-  frame.update();
-  frame.render();
-  frame.flush();
+  gui.update();
+  gui.flush();
   if (result === VK_SUBOPTIMAL_KHR || result === VK_ERROR_OUT_OF_DATE_KHR) {
     // end
   } else {

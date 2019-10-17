@@ -1,34 +1,37 @@
 {
-  "name": "nvk-ui",
+  "name": "azula",
   "main": "index.js",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "engines": {
     "node": ">= 10.9.0"
   },
   "config": {},
   "scripts": {
     "build": "node ./build.js",
-    "test": "node --inspect --experimental-modules test.mjs"
+    "install": "node-gyp rebuild"
   },
   "devDependencies": {
-    "bindings": "^1.4.0",
     "ncp": "^2.0.0",
-    "node-addon-api": "^1.6.2"
+    "node-addon-api": "^1.7.1"
   },
-  "dependencies": {
-    "nvk": "file:../node-vulkan",
-    "nvk-essentials": "^0.1.2"
-  },
-  "description": "Vulkan rendering API for node",
+  "dependencies": {},
+  "description": "Lightweight GPU accelerated HTML GUI for Node",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maierfelix/nvk-ui.git"
+    "url": "git+https://github.com/maierfelix/azula.git"
   },
-  "keywords": [],
+  "keywords": [
+    "GUI",
+    "GPU",
+    "WebKit",
+    "HTML",
+    "CSS"
+  ],
   "author": "Felix Maier",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maierfelix/nvk-ui/issues"
+    "url": "https://github.com/maierfelix/azula/issues"
   },
-  "homepage": "https://github.com/maierfelix/nvk-ui#readme"
+  "homepage": "https://github.com/maierfelix/azula#readme",
+  "gypfile": true
 }
