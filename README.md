@@ -191,6 +191,8 @@ window.onbinarymessage = (buffer, args) => {
 };
 ````
 
+An equivalent method is available in the GUI.
+
 #### Window.prototype.dispatchBinaryBuffer
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
