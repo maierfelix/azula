@@ -81,7 +81,7 @@ window.title; // "My App"
 
 #### Window.prototype.loadHTML
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | html | *String* | String representation of the HTML to load |
 
@@ -91,7 +91,7 @@ window.loadHTML("<button>Hello World!</button>");
 
 #### Window.prototype.loadFile
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | path | *String* | The path from where the content gets read from |
 
@@ -107,7 +107,7 @@ window.loadFile("./index.html");
 
 The callback's Event parameter has the following structure:
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | width | *Number* | The new width of the window |
 | height | *Number* | The new height of the window |
@@ -128,7 +128,7 @@ The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https:/
 
 The callback's Event parameter has the following structure:
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | level | *String* | The level of the console call. For example *"log"*, *"warn"* or *"error"* |
 | callee | *Function* | Node's equivalent console function to call |
@@ -138,7 +138,7 @@ The callback's Event parameter has the following structure:
 
 The location Object comes with the following structure:
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | line | *Number* | The code line where the console call originated from |
 | column | *Number* | The code column where the console call originated from |
@@ -158,7 +158,7 @@ window.onconsolemessage = e => {
 
 The callback's Event parameter has the following structure:
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | name | *String* | A name representing the cursor type to change to |
 
@@ -180,7 +180,7 @@ The second argument is an Object (and is optional), which can be used to give so
 
 The callback's Event parameter has the following structure:
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | buffer | *ArrayBuffer* | The ArrayBuffer sent from the GUI |
 | args (*Optional*) | *Object* | An Used-defined Object providing additional information about the sent *buffer* |
@@ -197,7 +197,7 @@ The *binarymessage* system should only be used when sending large data between N
 
 The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
 
-| name | Type | Description |
+| Name | Type | Description |
 | :--- | :--- | :--- |
 | buffer | *ArrayBuffer* | The ArrayBuffer to send to the GUI |
 | args (*Optional*) | *Object* | An Used-defined Object providing additional information about the *buffer* |
@@ -207,6 +207,76 @@ window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 ````
 
 An equivalent method is available in the GUI.
+
+#### Window.prototype.dispatchMouseEvent
+
+The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| type | *String* | The type of event |
+| x | *Number* | The horizontal position of the mouse |
+| y | *Number* | The vertical position of the mouse |
+| button | *Number* | The currently pressed mouse button |
+
+The following event types are available:
+
+| Name | Type |
+| :--- | :--- |
+| onmousedown | Simulating a mouse press action |
+| onmouseup | Simulating a mouse leave action |
+| onmousemove | Simulating a mouse move action |
+| onmousewheel | Simulating a mouse wheel action |
+
+````js
+window.dispatchMouseEvent("onmousedown", 16, 32, 1); // press the left mouse button at 16:32
+window.dispatchMouseEvent("onmouseup", 16, 32, 1); // leave the left mouse button at 16:32
+window.dispatchMouseEvent("onmousemove", 16, 32, 0); // move the mouse to 16:32 without pressing a mouse button
+````
+
+#### Window.prototype.dispatchScrollEvent
+
+The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| type | *String* | The type of event |
+| deltaX | *Number* | The horizontal amount to scroll |
+| deltaY | *Number* | The vertical amount to scroll |
+
+The following event types are available:
+
+| Name | Type |
+| :--- | :--- |
+| onmousewheel | Simulating a mouse wheel action |
+
+````js
+window.dispatchScrollEvent("onmousewheel", 0, 1); // scroll upwards, vertically by 1
+window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizontally by -1
+````
+
+#### Window.prototype.dispatchKeyEvent
+
+The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+
+Key Codes are mapped towards [GLFW's Key Codes](https://www.glfw.org/docs/latest/group__keys.html).
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| type | *String* | The type of event |
+| keyCode | *Number* | A key code representing which key to press |
+
+The following event types are available:
+
+| Name | Type |
+| :--- | :--- |
+| onkeydown | Simulating a key press action |
+| onkeyup | Simulating a key leave action |
+
+````js
+window.dispatchKeyEvent("onkeydown", x); // press a key
+window.dispatchKeyEvent("onkeyup", x); // leave a key
+````
 
 #### Window.prototype.getSharedHandleD3D11
 
