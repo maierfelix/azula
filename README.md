@@ -10,9 +10,6 @@
   <a href="https://www.npmjs.com/package/azula">
     <img src="https://img.shields.io/npm/v/azula.svg?style=flat-square" alt="NPM Version" />
   </a>
-  <a href="//www.npmjs.com/package/azula">
-    <img src="https://img.shields.io/npm/dt/azula.svg?style=flat-square" alt="NPM Downloads" />
-  </a>
   <br/>
   <br/>
   <img src="https://i.imgur.com/bfwxryC.gif" />
