@@ -99,9 +99,74 @@ window.loadHTML("<button>Hello World!</button>");
 window.loadFile("./index.html");
 ````
 
+#### Window.prototype.onresize
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when the window gets resized |
+
+The callback's event parameter has the following structure:
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| width | *Number* | The new width of the window |
+| height | *Number* | The new height of the window |
+
+````js
+window.onresize = e => {
+  console.log(e.width, e.height);
+};
+````
+
+#### Window.prototype.onconsolemessage
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when a console message got sent |
+
+The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https://developer.apple.com/documentation/javascriptcore) engine. Now this means, that the JavaScript running in the GUI is separated from the JavaScript in Node. When the JavaScript in the GUI makes a call to the console, e.g. `console.log(42);`, we have to route this call over to Node.
+
+The callback's event parameter has the following structure:
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| level | *String* | The level of the console call. For example *"log"*, *"warn"* or *"error"* |
+| callee | *Function* | Node's equivalent console function to call |
+| message | *String* | The message passed to the console call |
+| source | *String* | The file or location where the call was made. Is empty when [loadHTML](windowprototypeloadhtml) was used |
+| location | *Object* | An Object describing the exact code location where the console call was made from |
+
+The location Object comes with the following structure:
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| line | *Number* | The code line where the console call originated from |
+| column | *Number* | The code column where the console call originated from |
+
+````js
+window.onconsolemessage = e => {
+  let location = `at ${e.source ? e.source + ":" : ""}${e.location.line}:${e.location.column}`;
+  e.callee.apply(console, [e.message, location]);
+};
+````
+
+#### Window.prototype.getSharedHandleD3D11
+
+| Type | Description |
+| :--- | :--- |
+| *BigInt* | A BigInt representing a Windows HANDLE |
+
+On Windows, you can use this method to retrieve a shared [HANDLE](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types) to the underlying D3D11 render texture.
+
+````js
+let handle = window.getSharedHandleD3D11();
+````
+
 ### OSR
 
 *azula* supports running in OSR (*Offscreen rendering*) mode. This means, that instead of creating a window, an invisible texture gets used and rendered into. This texture can then be imported into a 3D engine for example. Another common use case would be, to display the texture in a VR environment.
+
+On **Windows**, you can request a shared HANDLE using the Window's [getSharedHandleD3D11](#windowprototypegetsharedhandled3d11) method.
 
 ## License
 
