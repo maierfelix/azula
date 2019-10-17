@@ -278,6 +278,22 @@ window.dispatchKeyEvent("onkeydown", x); // press a key
 window.dispatchKeyEvent("onkeyup", x); // leave a key
 ````
 
+#### Window.prototype.update
+
+This method should be called to poll window events (making the window interactive). In *non-OSR* mode, this method also does the painting of the window.
+
+````js
+window.update();
+````
+
+#### Window.prototype.flush
+
+This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and also flushes the underlying context.
+
+````js
+window.flush();
+````
+
 #### Window.prototype.getSharedHandleD3D11
 
 | Type | Description |
