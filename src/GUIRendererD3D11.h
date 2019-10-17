@@ -20,11 +20,11 @@ namespace nodegui {
     GUIRendererD3D11(GUIFrame* frame);
     ~GUIRendererD3D11() {};
 
-    virtual void Flush() override;
-    virtual void BeginDrawing() override;
-    virtual void EndDrawing() override;
+    void Flush() override;
+    void BeginDrawing() override;
+    void EndDrawing() override;
 
-    ul::GPUContextD3D11* gpu_context();
+    ul::GPUContextD3D11* gpu_context() { assert(gpu_context_); return gpu_context_.get(); }
 
     Napi::Value GetSharedHandleD3D11(Napi::Env env);
 

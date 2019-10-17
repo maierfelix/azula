@@ -15,9 +15,21 @@ namespace nodegui {
 
   GUIFrame::GUIFrame(const Napi::CallbackInfo& info) :
     Napi::ObjectWrap<GUIFrame>(info),
-    renderer(std::make_unique<GUIRendererD3D11>(this)),
     env_(info.Env()) {
 
+    if (info[0].IsObject()) {
+      Napi::Object opts = info[0].As<Napi::Object>();
+      if (opts.Has("useOffscreenRendering")) {
+        use_offscreen_rendering = opts.Get("useOffscreenRendering").As<Napi::Boolean>().Value();
+      }
+    }
+
+    if (use_offscreen_rendering) {
+      renderer = std::make_unique<GUIRendererD3D11>(this);
+    }
+    else {
+      renderer = std::make_unique<GUIRenderer>(this);
+    }
   }
   GUIFrame::~GUIFrame() {
 
@@ -44,21 +56,25 @@ namespace nodegui {
   Napi::Value GUIFrame::LoadHTML(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Expected 'String' for argument 1");
+      Napi::TypeError::New(env, "Expected 'String' for argument 1").ThrowAsJavaScriptException();
       return env.Undefined();
     }
     std::string html = info[0].As<Napi::String>().Utf8Value();
-    renderer->view()->LoadHTML(html.c_str());
+    renderer->LoadHTML(html);
     return env.Undefined();
   }
 
   Napi::Value GUIFrame::GetSharedHandleD3D11(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
+    if (!use_offscreen_rendering) {
+      Napi::Error::New(env, "Calling 'getSharedHandleD3D11' is only allowed in OSR mode").ThrowAsJavaScriptException();
+      return Napi::BigInt::New(env, (uint64_t) 0);
+    }
 #ifdef WIN32
     GUIRendererD3D11* rendererD3D11 = (GUIRendererD3D11*) renderer.get();
     return rendererD3D11->GetSharedHandleD3D11(env);
 #else
-    return Napi::BigInt::New(env, 0ll);
+    return Napi::BigInt::New(env, (uint64_t)0);
 #endif
   }
 
@@ -158,6 +174,14 @@ namespace nodegui {
 
     renderer->view()->FireScrollEvent(evt);
     return env.Undefined();
+  }
+
+  Napi::Value GUIFrame::ShouldClose(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    if (!use_offscreen_rendering) {
+      return Napi::Boolean::New(env, !renderer->app()->is_running());
+    }
+    return Napi::Boolean::New(env, false);
   }
 
   void GUIFrame::OnDOMReady(ul::View* caller) {
@@ -321,6 +345,10 @@ namespace nodegui {
       InstanceMethod(
         "dispatchScrollEvent",
         &GUIFrame::DispatchScrollEvent
+      ),
+      InstanceMethod(
+        "shouldClose",
+        &GUIFrame::ShouldClose
       ),
       InstanceAccessor(
         "onbinarymessage",

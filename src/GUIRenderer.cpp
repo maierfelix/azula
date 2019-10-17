@@ -8,25 +8,31 @@ namespace ul = ultralight;
 
 namespace nodegui {
 
-  GUIRenderer::GUIRenderer(GUIFrame* frame): frame_(frame) {
+  GUIRenderer::GUIRenderer(GUIFrame* frame_): frame_(frame_) {
+    // create a window if offscreen rendering is not enabled
+    if (!frame()->use_offscreen_rendering) {
+      app_ = ul::App::Create();
 
+      window_ = ul::Window::Create(app()->main_monitor(), 512, 512, false, ul::kWindowFlags_Titled | ul::kWindowFlags_Resizable);
+      window()->SetTitle("");
+      app()->set_window(*window_.get());
+
+      overlay_ = ul::Overlay::Create(*window_.get(), window_->width(), window_->height(), 0, 0);
+      overlay()->view()->LoadHTML("");
+      overlay()->view()->set_load_listener(this);
+      overlay()->view()->set_view_listener(this);
+
+      window_->set_listener(this);
+      app()->set_is_running(true);
+    }
   }
 
-  GUIFrame* GUIRenderer::frame() { assert(frame_); return frame_; }
-
-  ul::RefPtr<ul::View> GUIRenderer::view() { assert(view_.get()); return view_.get(); }
-  ul::RefPtr<ul::Renderer> GUIRenderer::renderer() { assert(renderer_.get()); return renderer_.get(); }
-
-  ul::FontLoader* GUIRenderer::font_loader() { assert(font_loader_.get()); return font_loader_.get(); }
-  ul::FileSystem* GUIRenderer::file_system() { assert(file_system_.get()); return file_system_.get(); }
-  ul::GPUDriver* GUIRenderer::gpu_driver() { assert(gpu_driver_); return gpu_driver_.get(); }
-
   void GUIRenderer::OnDOMReady(ul::View* caller) {
-    return frame_->OnDOMReady(caller);
+    return frame()->OnDOMReady(caller);
   }
 
   void GUIRenderer::OnChangeCursor(ul::View* caller, ul::Cursor cursor) {
-    return frame_->OnChangeCursor(caller, cursor);
+    return frame()->OnChangeCursor(caller, cursor);
   }
 
   void GUIRenderer::OnAddConsoleMessage(
@@ -38,48 +44,60 @@ namespace nodegui {
     uint32_t column_number,
     const ul::String& source_id
   ) {
-    return frame_->OnAddConsoleMessage(caller, source, level, message, line_number, column_number, source_id);
+    return frame()->OnAddConsoleMessage(caller, source, level, message, line_number, column_number, source_id);
+  }
+
+  void GUIRenderer::OnClose() {
+
+  }
+
+  void GUIRenderer::OnResize(uint32_t width, uint32_t height) {
+    overlay()->Resize(width, height);
   }
 
   ul::JSValue GUIRenderer::DispatchBinaryBuffer(const ul::JSObject& thisObject, const ul::JSArgs& info) {
-    return frame_->OnDispatchBinaryBuffer(thisObject, info);
+    return frame()->OnDispatchBinaryBuffer(thisObject, info);
   }
 
   void GUIRenderer::Initialize(ul::Platform& platform) {
-
     platform.set_font_loader(font_loader());
     platform.set_file_system(file_system());
     renderer_ = ul::Renderer::Create();
 
     view_ = renderer_->CreateView(512, 512, true);
-    view_->set_load_listener(this);
-    view_->set_view_listener(this);
+    view()->set_load_listener(this);
+    view()->set_view_listener(this);
 
-    view_->LoadHTML("");
+    view()->LoadHTML("");
     // called initially so we can take a shared handle immediately
     Update();
     Render();
   }
 
   void GUIRenderer::Flush() {
-
+    if (!frame()->use_offscreen_rendering) return;
   }
 
   void GUIRenderer::Update() {
-    renderer_->Update();
+    if (frame()->use_offscreen_rendering) {
+      renderer()->Update();
+    }
+    else {
+      app()->UpdateTick();
+    }
   }
 
   void GUIRenderer::Render() {
-    renderer_->Update();
-    renderer_->Render();
-
-    if (gpu_driver_->HasCommandsPending()) {
+    if (!frame()->use_offscreen_rendering) return;
+    renderer()->Update();
+    renderer()->Render();
+    if (gpu_driver()->HasCommandsPending()) {
       BeginDrawing();
-      gpu_driver_->DrawCommandList();
+      gpu_driver()->DrawCommandList();
       EndDrawing();
     }
     UpdateGeometry();
-    gpu_driver_->DrawGeometry(geometry_id, 6, 0, gpu_state);
+    gpu_driver()->DrawGeometry(geometry_id, 6, 0, gpu_state);
   }
 
   void GUIRenderer::BeginDrawing() {
@@ -90,9 +108,20 @@ namespace nodegui {
 
   }
 
+  void GUIRenderer::LoadHTML(std::string& html) {
+    if (frame()->use_offscreen_rendering) {
+      view()->LoadHTML(html.c_str());
+    }
+    else {
+      overlay()->view()->LoadHTML(html.c_str());
+    }
+  }
+
   void GUIRenderer::UpdateGeometry() {
+    if (!frame()->use_offscreen_rendering) return;
+
     bool initial_creation = false;
-    ul::RenderTarget target = view_->render_target();
+    ul::RenderTarget target = view()->render_target();
 
     if (vertices.empty()) {
       vertices.resize(4);
@@ -176,12 +205,12 @@ namespace nodegui {
     ibuffer.data = (uint8_t*)indices.data();
 
     if (initial_creation) {
-      geometry_id = gpu_driver_->NextGeometryId();
-      gpu_driver_->CreateGeometry(geometry_id, vbuffer, ibuffer);
+      geometry_id = gpu_driver()->NextGeometryId();
+      gpu_driver()->CreateGeometry(geometry_id, vbuffer, ibuffer);
       return;
     }
 
-    gpu_driver_->UpdateGeometry(geometry_id, vbuffer, ibuffer);
+    gpu_driver()->UpdateGeometry(geometry_id, vbuffer, ibuffer);
   }
 
 }

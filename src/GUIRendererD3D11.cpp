@@ -24,52 +24,54 @@ using Microsoft::WRL::ComPtr;
 
 namespace nodegui {
 
-  GUIRendererD3D11::GUIRendererD3D11(GUIFrame* frame): GUIRenderer(frame) {
+  GUIRendererD3D11::GUIRendererD3D11(GUIFrame* frame_): GUIRenderer(frame_) {
     config.face_winding = ul::kFaceWinding_Clockwise;
     config.device_scale_hint = 1.0f;
-    config.use_bgra_for_offscreen_rendering = true;
+    if (frame()->use_offscreen_rendering) {
+      config.use_bgra_for_offscreen_rendering = true;
+    }
 
     font_loader_ = std::make_unique<ul::FontLoaderWin>();
     file_system_ = std::make_unique<ul::FileSystemWin>(L"");
 
     gpu_context_ = std::make_unique<ul::GPUContextD3D11>();
-    gpu_context_.get()->Initialize(NULL, 512, 512, 1.0, false, true, true, 4);
-    gpu_driver_ = std::make_unique<ul::GPUDriverD3D11>(gpu_context_.get());
+    if (frame()->use_offscreen_rendering) {
+      gpu_context()->Initialize(NULL, 512, 512, 1.0, false, true, true, 4);
+    }
+    gpu_driver_ = std::make_unique<ul::GPUDriverD3D11>(gpu_context());
 
     ul::Platform& platform = ul::Platform::instance();
     platform.set_config(config);
-    platform.set_gpu_driver(gpu_driver_.get());
+    platform.set_gpu_driver(gpu_driver());
     Initialize(platform);
   }
 
   Napi::Value GUIRendererD3D11::GetSharedHandleD3D11(Napi::Env env) {
     HRESULT hr = S_OK;
-    ComPtr<IDXGIResource1> resource;
 
     Flush();
 
-    ul::GPUDriverD3D11* gpu_driver = (ul::GPUDriverD3D11*) gpu_driver_.get();
+    ul::GPUDriverD3D11* gpu_driver_d3d11 = (ul::GPUDriverD3D11*) gpu_driver();
 
+    ComPtr<IDXGIResource1> resource;
     uint32_t id = view()->render_target().render_buffer_id;
-    hr = gpu_driver->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
+    hr = gpu_driver_d3d11->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
     if FAILED(hr) {
-      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to query interface", (LPCWSTR)L"D3D11 Error", MB_OK);
+      Napi::Error::New(env, "D3D11 Error: Failed to query interface").ThrowAsJavaScriptException();
       return env.Undefined();
     }
     HANDLE outputHandle;
     hr = resource->CreateSharedHandle(nullptr, GENERIC_ALL, nullptr, &outputHandle);
     if FAILED(hr) {
-      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to create shared handle", (LPCWSTR)L"D3D11 Error", MB_OK);
+      Napi::Error::New(env, "D3D11 Error: Failed to create shared handle").ThrowAsJavaScriptException();
       return env.Undefined();
     }
 
     return Napi::BigInt::New(env, reinterpret_cast<uintptr_t>(outputHandle));
   }
 
-  ul::GPUContextD3D11* GUIRendererD3D11::gpu_context() { assert(gpu_context_); return gpu_context_.get(); }
-
   void GUIRendererD3D11::Flush() {
-    gpu_context_->immediate_context()->Flush();
+    gpu_context()->immediate_context()->Flush();
   }
 
   void GUIRendererD3D11::BeginDrawing() {

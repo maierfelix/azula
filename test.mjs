@@ -42,7 +42,7 @@ let win = new VulkanWindow({
 });
 
 let frame = new addon.GUIFrame({
-  offscreen: true
+  useOffscreenRendering: true
 });
 
 let handleWin32 = frame.getSharedHandleD3D11();

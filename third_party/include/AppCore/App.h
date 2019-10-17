@@ -127,6 +127,11 @@ public:
   virtual AppListener* listener() = 0;
 
   ///
+  /// Set whether or not the App is running.
+  ///
+  virtual void set_is_running(bool state) = 0;
+
+  ///
   /// Whether or not the App is running.
   ///
   virtual bool is_running() const = 0;
@@ -149,6 +154,13 @@ public:
   /// @note  Make sure to call set_window before calling this.
   ///
   virtual void Run() = 0;
+
+  ///
+  /// Update the main loop without blocking.
+  ///
+  /// @note  Make sure to call set_window before calling this.
+  ///
+  virtual void UpdateTick() = 0;
 
   ///
   /// Quit the application.

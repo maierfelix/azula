@@ -13,6 +13,9 @@ namespace nodegui {
 
   class GUIFrame : public Napi::ObjectWrap<GUIFrame> {
   public:
+    GUIFrame(const Napi::CallbackInfo &info);
+    ~GUIFrame();
+
     static Napi::Object Initialize(Napi::Env env, Napi::Object exports);
     static Napi::FunctionReference constructor;
 
@@ -30,6 +33,8 @@ namespace nodegui {
     Napi::Value DispatchMouseEvent(const Napi::CallbackInfo& info);
     Napi::Value DispatchKeyEvent(const Napi::CallbackInfo& info);
     Napi::Value DispatchScrollEvent(const Napi::CallbackInfo& info);
+
+    Napi::Value ShouldClose(const Napi::CallbackInfo &info);
 
     // events passed in from GUIRenderer
     void OnDOMReady(ul::View* caller);
@@ -57,8 +62,7 @@ namespace nodegui {
     Napi::Value Getonconsolemessage(const Napi::CallbackInfo &info);
     void Setonconsolemessage(const Napi::CallbackInfo &info, const Napi::Value& value);
 
-    GUIFrame(const Napi::CallbackInfo &info);
-    ~GUIFrame();
+    bool use_offscreen_rendering = false;
   private:
     std::unique_ptr<GUIRenderer> renderer;
 

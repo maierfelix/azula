@@ -8,5 +8,5 @@ layout (location = 0) out vec4 fragColor;
 layout (binding = 0) uniform sampler2D uGUISampler;
 
 void main() {
-	fragColor = texture(uGUISampler, uv);
+  fragColor = texture(uGUISampler, uv);
 }
