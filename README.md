@@ -290,11 +290,13 @@ window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizont
 
 ## Binary Messaging
 
+The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https://developer.apple.com/documentation/javascriptcore) engine. The JavaScript engine of Node is different to the one used in *azula*, so we cannot directly exchange data. The Binary Messaging System allows to efficiently pass [ArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) between both engines. Even though the engines are different, ArrayBuffers can be exchanged without any copying, meaning they don't have any overhead.
+
 ### Window.prototype.dispatchBinaryBuffer
 
 An equivalent method is available in the GUI.
 
-The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a referenced buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
 The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
 
@@ -311,7 +313,7 @@ window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 
 An equivalent method is available in the GUI.
 
-The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a referenced buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
 The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
 
