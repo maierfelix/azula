@@ -20,7 +20,11 @@
 
 #
 
-### Platforms
+*azula* is a lightweight GPU accelerated HTML GUI for Node. This project uses [Ultralight](https://github.com/ultralight-ux/Ultralight), which is a Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
+
+*azula* supports running in [OSR](#OSR) mode, which makes it easy to embed *azula* in existing projects as a GUI solution.
+
+## Platforms
 
 *azula* comes with pre-built N-API binaries for the following platforms:
 
@@ -30,5 +34,52 @@
 | <img src="https://i.imgur.com/bkBCY7V.png" alt="" height="16px">  Linux         | ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ In Progress ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌|
 | <img src="https://i.imgur.com/iPt4GHz.png" alt="" height="16px">  MacOS         | ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ In Progress ‌‌ ‌‌ ‌‌ ‌‌ ‌‌ ‌‌|
 
-### API
+## API
 
+### Getting Started
+
+At first, install azula using:
+````
+npm install azula
+````
+
+You can now import *azula* into your project:
+````js
+const azula = require("azula");
+````
+
+### Window
+
+When creating a new Window, the following parameters are available:
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| width | *Number* | The initial width of the window |
+| height | *Number* | The initial height of the window |
+| useOffscreenRendering | *Boolean* | Creates the window in [OSR mode](#OSR) |
+
+Example:
+````js
+let window = new azula.Window({
+  width: 480,
+  height: 320,
+  useOffscreenRendering: false
+});
+````
+
+### OSR
+
+*azula* supports running in OSR (*Offscreen rendering*) mode. This means, that instead of creating a window, an invisible texture gets used and rendered into. This texture can then be imported into a 3D engine for example. Another common use case would be, to display the texture in a VR environment.
+
+## License
+
+Azula is MIT licensed, while [Ultralight](https://github.com/ultralight-ux/Ultralight/tree/master/license) comes with the following License:
+
+````
+Ultralight is free for non-commercial use, educational use, 
+and also free for commercial use by small indie developers making
+less than US$100,000 a year. You can find full terms in the SDK. 
+Pricing plans for larger commercial projects will be announced later.
+````
+
+For further information regaring the licensing of Ultralight, see [this](https://github.com/ultralight-ux/Ultralight) link.
