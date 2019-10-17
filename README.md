@@ -292,6 +292,8 @@ window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizont
 
 ### Window.prototype.dispatchBinaryBuffer
 
+An equivalent method is available in the GUI.
+
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
 The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
@@ -305,9 +307,9 @@ The second argument is an Object (and is optional), which can be used to give so
 window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 ````
 
-An equivalent method is available in the GUI.
-
 ### Window.prototype.onbinarymessage
+
+An equivalent method is available in the GUI.
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
@@ -330,9 +332,7 @@ window.onbinarymessage = (buffer, args) => {
 };
 ````
 
-An equivalent method is available in the GUI.
-
-## OSR Related
+## OSR Mode
 
 ### Window.prototype.getSharedHandleD3D11
 
