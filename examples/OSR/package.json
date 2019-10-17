@@ -1,5 +1,5 @@
 {
-  "name": "OSR",
+  "name": "osr",
   "version": "0.0.1",
   "scripts": {
     "start": "node --inspect --experimental-modules ./index.mjs"
