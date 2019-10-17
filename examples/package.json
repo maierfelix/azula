@@ -1,0 +1,10 @@
+{
+  "name": "examples",
+  "version": "0.0.1",
+  "scripts": {},
+  "dependencies": {
+    "nvk": "latest",
+    "nvk-essentials": "latest",
+    "azula": "file:../"
+  }
+}

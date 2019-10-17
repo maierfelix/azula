@@ -1,5 +1,5 @@
 import fs from "fs";
-import azula from "./index.js";
+import azula from "azula";
 
 let window = new azula.Window({
   width: 480,
@@ -27,7 +27,7 @@ window.onresize = e => {
   console.log(e.width, e.height);
 };
 
-window.loadHTML(fs.readFileSync("./test.html", "utf8"));
+window.loadHTML(fs.readFileSync("./index.html", "utf8"));
 
 window.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
 

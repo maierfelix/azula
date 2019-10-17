@@ -10,8 +10,8 @@ build/Release/*.map
 build/Release/*.ilk
 build/Release/obj.target
 
-shaders
 src
+examples
 third_party
 
 test.mjs

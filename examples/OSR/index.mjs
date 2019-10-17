@@ -1,6 +1,6 @@
 import fs from "fs";
 import nvk from "nvk";
-import azula from "./index.js";
+import azula from "azula";
 import essentials from "nvk-essentials";
 
 const {GLSL} = essentials;
@@ -37,10 +37,13 @@ let result = VK_SUCCESS;
 let win = new VulkanWindow({
   width: 512,
   height: 512,
-  title: "NVK GUI"
+  title: "NVK GUI",
+  resizable: false
 });
 
 let gui = new azula.Window({
+  width: win.width,
+  height: win.height,
   useOffscreenRendering: true
 });
 
