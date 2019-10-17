@@ -133,7 +133,7 @@ The callback's event parameter has the following structure:
 | level | *String* | The level of the console call. For example *"log"*, *"warn"* or *"error"* |
 | callee | *Function* | Node's equivalent console function to call |
 | message | *String* | The message passed to the console call |
-| source | *String* | The file or location where the call was made. Is empty when [loadHTML](windowprototypeloadhtml) was used |
+| source | *String* | The file or location where the call was made. Is empty when [loadHTML](#windowprototypeloadhtml) was used |
 | location | *Object* | An Object describing the exact code location where the console call was made from |
 
 The location Object comes with the following structure:
