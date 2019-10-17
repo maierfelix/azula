@@ -2,7 +2,7 @@
   "variables": {
     "root": "./",
     "platform": "<(OS)",
-    "release": "<@(module_root_dir)/build/Release",
+    "build": "Release",
     "vkSDK": "C:/VulkanSDK/1.1.121.2"
   },
   "conditions": [
@@ -39,14 +39,13 @@
               "<(vkSDK)/include",
             ],
             "library_dirs": [
-              "<(root)/third_party/lib/<(platform)/<(target_arch)/*",
+              "<(root)/third_party/lib/<(build)/<(platform)/<(target_arch)/*",
               "<(vkSDK)/lib",
             ],
             "link_settings": {
               "libraries": [
                 "D3DCompiler.lib",
                 "d3d11.lib",
-                #"glfw3dll.lib",
                 "vulkan-1.lib",
                 "AppCore.lib",
                 "Ultralight.lib",
@@ -79,7 +78,7 @@
               },
               "VCLinkerTool": {
                 "AdditionalLibraryDirectories": [
-                  "@PROJECT_SOURCE_DIR@/third_party/lib/<(platform)/<(target_arch)",
+                  "@PROJECT_SOURCE_DIR@/third_party/<(build)/lib/<(platform)/<(target_arch)",
                 ]
               }
             }

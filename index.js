@@ -4,6 +4,6 @@ const pkg = require("./package.json");
 
 let {platform} = process;
 
-const addon = require(`./build/Debug/addon-${platform}.node`);
+const addon = require(`./build/Release/addon-${platform}.node`);
 
 module.exports = addon;

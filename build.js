@@ -20,20 +20,26 @@ Node: ${nodeVersion}
 V8: ${v8Version}
 `);
 
+let build = "Release";
+
 // build
 // build/release
 let buildDir = `./build/`;
-let buildReleaseDir = buildDir + "Debug/";
+
+let buildDebugDir = buildDir + "Debug/";
+let buildReleaseDir = buildDir + "Release/";
+
 if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir);
+if (!fs.existsSync(buildDebugDir)) fs.mkdirSync(buildDebugDir);
 if (!fs.existsSync(buildReleaseDir)) fs.mkdirSync(buildReleaseDir);
 
 function copyFiles() {
   process.stdout.write(`\nCopying files..\n`);
   return new Promise(resolve => {
     // copy files into release folder
-    let libDir = `./third_party/lib/${platform}/${architecture}`;
-    let binDir = `./third_party/bin/${platform}/${architecture}`;
-    let targetDir = `./build/Debug`;
+    let libDir = `./third_party/${build}/lib/${platform}/${architecture}`;
+    let binDir = `./third_party/${build}/bin/${platform}/${architecture}`;
+    let targetDir = `./build/${build}`;
     let sdkPath = process.env.VULKAN_SDK;
     let files = [];
     // add win32 runtime files
@@ -57,10 +63,12 @@ function copyFiles() {
         [`${binDir}/WebCore.dll`, targetDir],
       );
       // pdbs
-      files.push(
-        [`${binDir}/AppCore.pdb`, targetDir],
-        [`${binDir}/WebCore.pdb`, targetDir],
-      );
+      if (build === "Debug") {
+        files.push(
+          [`${binDir}/AppCore.pdb`, targetDir],
+          [`${binDir}/WebCore.pdb`, targetDir],
+        );
+      }
     }
     let counter = 0;
     files.map(entry => {
@@ -94,7 +102,7 @@ function buildFiles() {
     if (platform === "win32") {
       msargs += `--msvs_version ${msvsVersion}`;
     }
-    let cmd = `node-gyp configure --debug && node-gyp build`;
+    let cmd = `node-gyp configure ${build === "Debug" ? "--debug" : ""} && node-gyp build`;
     let shell = spawn(cmd, { shell: true, stdio: "inherit" }, { stdio: "pipe" });
     shell.on("exit", error => {
       if (!error) process.stdout.write("Done!\n");

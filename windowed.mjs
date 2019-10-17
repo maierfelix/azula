@@ -72,16 +72,14 @@ frame.loadHTML(`
     }, 1e3);
   };
   setTimeout(() => {
-    window.onbinarymessage(new ArrayBuffer(16), { kind: 666 });
+    window.onbinarymessage(buf, { kind: 666 });
   }, 100);
   </script>
 `);
-//frame.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
+frame.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
 
 (function updateLoop() {
   if (frame.shouldClose()) return;
   frame.update();
-  frame.render();
-  frame.flush();
   setImmediate(updateLoop);
 })();
