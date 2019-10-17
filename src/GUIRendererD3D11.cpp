@@ -36,7 +36,7 @@ namespace nodegui {
 
     gpu_context_ = std::make_unique<ul::GPUContextD3D11>();
     if (frame()->use_offscreen_rendering) {
-      gpu_context()->Initialize(NULL, 512, 512, 1.0, false, true, true, 4);
+      gpu_context()->Initialize(NULL, frame()->width, frame()->height, 1.0, false, true, true, 4);
     }
     gpu_driver_ = std::make_unique<ul::GPUDriverD3D11>(gpu_context());
 

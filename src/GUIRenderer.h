@@ -33,7 +33,10 @@ namespace nodegui {
     virtual void BeginDrawing();
     virtual void EndDrawing();
 
+    virtual std::string GetTitle();
+    virtual void SetTitle(std::string& title);
     virtual void LoadHTML(std::string& html);
+    virtual void LoadFile(std::string& path);
 
     virtual void UpdateGeometry();
 
@@ -80,15 +83,15 @@ namespace nodegui {
     std::unique_ptr<ul::FileSystem> file_system_;
 
   private:
-    ul::Config config;
 
-    uint32_t geometry_id;
-    std::vector<ul::Vertex_2f_4ub_2f_2f_28f> vertices;
-    std::vector<ul::IndexType> indices;
+    uint32_t geometry_id_;
+    ul::GPUState gpu_state_;
+    std::vector<ul::Vertex_2f_4ub_2f_2f_28f> vertices_;
+    std::vector<ul::IndexType> indices_;
 
-    ul::GPUState gpu_state;
+    std::string title_;
 
-    bool needs_update = true;
+    bool needs_update_ = true;
   };
 
 }

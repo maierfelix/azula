@@ -24,6 +24,11 @@ namespace nodegui {
     Napi::Value Update(const Napi::CallbackInfo &info);
     Napi::Value Render(const Napi::CallbackInfo &info);
     Napi::Value Flush(const Napi::CallbackInfo &info);
+
+    Napi::Value GetTitle(const Napi::CallbackInfo &info);
+    void SetTitle(const Napi::CallbackInfo &info, const Napi::Value& value);
+
+    Napi::Value LoadFile(const Napi::CallbackInfo &info);
     Napi::Value LoadHTML(const Napi::CallbackInfo &info);
 
     // shared resources for different platforms
@@ -48,6 +53,8 @@ namespace nodegui {
       uint32_t column_number,
       const ul::String& source_id
     );
+    void OnResize(uint32_t width, uint32_t height);
+
     ul::JSValue OnDispatchBinaryBuffer(const ul::JSObject& thisObject, const ul::JSArgs& args);
 
     Napi::FunctionReference onbinarymessage;
@@ -61,6 +68,13 @@ namespace nodegui {
     Napi::FunctionReference onconsolemessage;
     Napi::Value Getonconsolemessage(const Napi::CallbackInfo &info);
     void Setonconsolemessage(const Napi::CallbackInfo &info, const Napi::Value& value);
+
+    Napi::FunctionReference onresize;
+    Napi::Value Getonresize(const Napi::CallbackInfo &info);
+    void Setonresize(const Napi::CallbackInfo &info, const Napi::Value& value);
+
+    uint32_t width = 640;
+    uint32_t height = 480;
 
     bool use_offscreen_rendering = false;
   private:

@@ -22,6 +22,12 @@ namespace nodegui {
       if (opts.Has("useOffscreenRendering")) {
         use_offscreen_rendering = opts.Get("useOffscreenRendering").As<Napi::Boolean>().Value();
       }
+      if (opts.Has("width")) {
+        width = opts.Get("width").As<Napi::Number>().Uint32Value();
+      }
+      if (opts.Has("height")) {
+        height = opts.Get("height").As<Napi::Number>().Uint32Value();
+      }
     }
 
     if (use_offscreen_rendering) {
@@ -50,6 +56,32 @@ namespace nodegui {
   Napi::Value GUIFrame::Flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     renderer->Flush();
+    return env.Undefined();
+  }
+
+  Napi::Value GUIFrame::GetTitle(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, renderer->GetTitle());
+  }
+
+  void GUIFrame::SetTitle(const Napi::CallbackInfo &info, const Napi::Value& value) {
+    Napi::Env env = info.Env();
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Expected 'String' for argument 1").ThrowAsJavaScriptException();
+    }
+    else {
+      renderer->SetTitle(info[0].As<Napi::String>().Utf8Value());
+    }
+  }
+
+  Napi::Value GUIFrame::LoadFile(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Expected 'String' for argument 1").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+    std::string path = info[0].As<Napi::String>().Utf8Value();
+    renderer->LoadFile(path);
     return env.Undefined();
   }
 
@@ -264,6 +296,17 @@ namespace nodegui {
     return ul::JSValue(undefined);
   };
 
+  void GUIFrame::OnResize(uint32_t width_, uint32_t height_) {
+    Napi::Env env = env_;
+    width = width_;
+    height = height_;
+    if (onresize.IsEmpty()) return;
+    Napi::Object out = Napi::Object::New(env);
+    out.Set("width", Napi::Number::New(env, width));
+    out.Set("height", Napi::Number::New(env, height));
+    onresize.Value().As<Napi::Function>().Call({ out });
+  }
+
   // onbinarymessage
   Napi::Value GUIFrame::Getonbinarymessage(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
@@ -303,6 +346,19 @@ namespace nodegui {
     else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
   }
 
+  // onresize
+  Napi::Value GUIFrame::Getonresize(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (this->onresize.IsEmpty()) return env.Null();
+    return this->onresize.Value().As<Napi::Function>();
+  }
+  void GUIFrame::Setonresize(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    Napi::Env env = info.Env();
+    if (value.IsFunction()) this->onresize.Reset(value.As<Napi::Function>(), 1);
+    else if (value.IsNull()) this->onresize.Reset();
+    else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
+  }
+
   Napi::Object GUIFrame::Initialize(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GUIFrame", {
@@ -321,6 +377,16 @@ namespace nodegui {
         "flush",
         &GUIFrame::Flush,
         napi_enumerable
+      ),
+      InstanceAccessor(
+        "title",
+        &GUIFrame::GetTitle,
+        &GUIFrame::SetTitle,
+        napi_enumerable
+      ),
+      InstanceMethod(
+        "loadFile",
+        &GUIFrame::LoadFile
       ),
       InstanceMethod(
         "loadHTML",
@@ -368,7 +434,13 @@ namespace nodegui {
         &GUIFrame::Setonconsolemessage,
         napi_enumerable
       ),
-      });
+      InstanceAccessor(
+        "onresize",
+        &GUIFrame::Getonresize,
+        &GUIFrame::Setonresize,
+        napi_enumerable
+      ),
+    });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
     exports.Set("GUIFrame", func);
