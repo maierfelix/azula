@@ -48,7 +48,7 @@ const azula = require("azula");
 
 ## API
 
-### Window
+## Window
 
 When creating a new Window, the following parameters are available:
 
@@ -68,7 +68,7 @@ let window = new azula.Window({
 });
 ````
 
-#### Window.prototype.title
+### Window.prototype.title
 
 | Type | Description |
 | :--- | :--- |
@@ -79,7 +79,7 @@ window.title = "My App";
 window.title; // "My App"
 ````
 
-#### Window.prototype.loadHTML
+### Window.prototype.loadHTML
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
@@ -89,7 +89,7 @@ window.title; // "My App"
 window.loadHTML("<button>Hello World!</button>");
 ````
 
-#### Window.prototype.loadFile
+### Window.prototype.loadFile
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
@@ -99,7 +99,7 @@ window.loadHTML("<button>Hello World!</button>");
 window.loadFile("./index.html");
 ````
 
-#### Window.prototype.onresize
+### Window.prototype.onresize
 
 | Type | Description |
 | :--- | :--- |
@@ -118,7 +118,7 @@ window.onresize = e => {
 };
 ````
 
-#### Window.prototype.onconsolemessage
+### Window.prototype.onconsolemessage
 
 | Type | Description |
 | :--- | :--- |
@@ -150,7 +150,7 @@ window.onconsolemessage = e => {
 };
 ````
 
-#### Window.prototype.oncursorchange
+### Window.prototype.oncursorchange
 
 | Type | Description |
 | :--- | :--- |
@@ -168,7 +168,7 @@ window.oncursorchange = e => {
 };
 ````
 
-#### Window.prototype.onbinarymessage
+### Window.prototype.onbinarymessage
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
@@ -193,7 +193,7 @@ window.onbinarymessage = (buffer, args) => {
 
 An equivalent method is available in the GUI.
 
-#### Window.prototype.dispatchBinaryBuffer
+### Window.prototype.dispatchBinaryBuffer
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
@@ -210,7 +210,7 @@ window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 
 An equivalent method is available in the GUI.
 
-#### Window.prototype.dispatchMouseEvent
+### Window.prototype.dispatchMouseEvent
 
 The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
 
@@ -236,7 +236,7 @@ window.dispatchMouseEvent("onmouseup", 16, 32, 1); // leave the left mouse butto
 window.dispatchMouseEvent("onmousemove", 16, 32, 0); // move the mouse to 16:32 without pressing a mouse button
 ````
 
-#### Window.prototype.dispatchScrollEvent
+### Window.prototype.dispatchScrollEvent
 
 The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
 
@@ -257,7 +257,7 @@ window.dispatchScrollEvent("onmousewheel", 0, 1); // scroll upwards, vertically 
 window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizontally by -1
 ````
 
-#### Window.prototype.dispatchKeyEvent
+### Window.prototype.dispatchKeyEvent
 
 The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
 
@@ -280,7 +280,7 @@ window.dispatchKeyEvent("onkeydown", x); // press a key
 window.dispatchKeyEvent("onkeyup", x); // leave a key
 ````
 
-#### Window.prototype.update
+### Window.prototype.update
 
 This method should be called to poll window events (making the window interactive). In *non-OSR* mode, this method also does the painting of the window.
 
@@ -288,7 +288,7 @@ This method should be called to poll window events (making the window interactiv
 window.update();
 ````
 
-#### Window.prototype.flush
+### Window.prototype.flush
 
 This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and flushes the underlying context.
 
@@ -296,7 +296,7 @@ This method should only be used in [OSR](#osr) mode. Calling this method execute
 window.flush();
 ````
 
-#### Window.prototype.getSharedHandleD3D11
+### Window.prototype.getSharedHandleD3D11
 
 | Type | Description |
 | :--- | :--- |
@@ -308,7 +308,7 @@ On Windows, you can use this method to retrieve a shared [HANDLE](https://docs.m
 let handle = window.getSharedHandleD3D11();
 ````
 
-### OSR
+## OSR
 
 *azula* supports running in OSR (*Offscreen rendering*) mode. This means, that instead of creating a window, an invisible texture gets used and rendered into. This texture can then be imported into a 3D engine for example. Another common use case would be, to display the texture in a VR environment.
 
