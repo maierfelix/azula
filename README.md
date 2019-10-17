@@ -288,7 +288,7 @@ window.update();
 
 #### Window.prototype.flush
 
-This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and also flushes the underlying context.
+This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and flushes the underlying context.
 
 ````js
 window.flush();
