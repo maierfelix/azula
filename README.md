@@ -105,7 +105,7 @@ window.loadFile("./index.html");
 | :--- | :--- |
 | *Function* | The function to call when the window gets resized |
 
-The callback's event parameter has the following structure:
+The callback's Event parameter has the following structure:
 
 | name | Type | Description |
 | :--- | :--- | :--- |
@@ -126,7 +126,7 @@ window.onresize = e => {
 
 The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https://developer.apple.com/documentation/javascriptcore) engine. Now this means, that the JavaScript running in the GUI is separated from the JavaScript in Node. When the JavaScript in the GUI makes a call to the console, e.g. `console.log(42);`, we have to route this call over to Node.
 
-The callback's event parameter has the following structure:
+The callback's Event parameter has the following structure:
 
 | name | Type | Description |
 | :--- | :--- | :--- |
@@ -149,6 +149,64 @@ window.onconsolemessage = e => {
   e.callee.apply(console, [e.message, location]);
 };
 ````
+
+#### Window.prototype.oncursorchange
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when the cursor should be changed |
+
+The callback's Event parameter has the following structure:
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| name | *String* | A name representing the cursor type to change to |
+
+````js
+window.oncursorchange = e => {
+  console.log(e.name);
+};
+````
+
+#### Window.prototype.onbinarymessage
+
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+
+The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when a binary message was sent from the GUI |
+
+The callback's Event parameter has the following structure:
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| buffer | *ArrayBuffer* | The ArrayBuffer sent from the GUI |
+| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the sent *buffer* |
+
+````js
+window.onbinarymessage = (buffer, args) => {
+  console.log(buffer, args);
+};
+````
+
+#### Window.prototype.dispatchBinaryBuffer
+
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+
+The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
+
+| name | Type | Description |
+| :--- | :--- | :--- |
+| buffer | *ArrayBuffer* | The ArrayBuffer to send to the GUI |
+| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the *buffer* |
+
+````js
+window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
+````
+
+An equivalent method is available in the GUI.
 
 #### Window.prototype.getSharedHandleD3D11
 
