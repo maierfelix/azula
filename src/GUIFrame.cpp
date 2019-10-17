@@ -2,7 +2,10 @@
 #include <napi.h>
 
 #include "GUIFrame.h"
+
+#ifdef WIN32
 #include "GUIRendererD3D11.h"
+#endif
 
 namespace ul = ultralight;
 
@@ -20,25 +23,25 @@ namespace nodegui {
 
   }
 
-  Napi::Value GUIFrame::update(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::Update(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     renderer->Update();
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::render(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::Render(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     renderer->Render();
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::flush(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::Flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     renderer->Flush();
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::loadHTML(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::LoadHTML(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (!info[0].IsString()) {
       Napi::TypeError::New(env, "Expected 'String' for argument 1");
@@ -49,33 +52,17 @@ namespace nodegui {
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::getSharedHandle(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::GetSharedHandleD3D11(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-
-    HRESULT hr = S_OK;
-    ComPtr<IDXGIResource1> resource;
-
-    renderer->Flush();
-
-    ul::GPUDriverD3D11* gpu_driver = (ul::GPUDriverD3D11*) renderer->gpu_driver();
-
-    uint32_t id = renderer->view()->render_target().render_buffer_id;
-    hr = gpu_driver->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
-    if FAILED(hr) {
-      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to query interface", (LPCWSTR)L"D3D11 Error", MB_OK);
-      return env.Undefined();
-    }
-    HANDLE outputHandle;
-    hr = resource->CreateSharedHandle(nullptr, GENERIC_ALL, nullptr, &outputHandle);
-    if FAILED(hr) {
-      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to create shared handle", (LPCWSTR)L"D3D11 Error", MB_OK);
-      return env.Undefined();
-    }
-
-    return Napi::BigInt::New(env, reinterpret_cast<uintptr_t>(outputHandle));
+#ifdef WIN32
+    GUIRendererD3D11* rendererD3D11 = (GUIRendererD3D11*) renderer.get();
+    return rendererD3D11->GetSharedHandleD3D11(env);
+#else
+    return Napi::BigInt::New(env, 0ll);
+#endif
   }
 
-  Napi::Value GUIFrame::dispatchBinaryBuffer(const Napi::CallbackInfo &info) {
+  Napi::Value GUIFrame::DispatchBinaryBuffer(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     JSContextRef ctx = ul::GetJSContext();
 
@@ -113,7 +100,7 @@ namespace nodegui {
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::dispatchMouseEvent(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::DispatchMouseEvent(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     std::string eventType = info[0].As<Napi::String>().Utf8Value();
     ul::MouseEvent evt;
@@ -141,7 +128,7 @@ namespace nodegui {
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::dispatchKeyEvent(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::DispatchKeyEvent(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     ul::KeyEvent evt;
     std::string eventType = info[0].As<Napi::String>().Utf8Value();
@@ -161,7 +148,7 @@ namespace nodegui {
     return env.Undefined();
   }
 
-  Napi::Value GUIFrame::dispatchScrollEvent(const Napi::CallbackInfo& info) {
+  Napi::Value GUIFrame::DispatchScrollEvent(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     std::string eventType = info[0].As<Napi::String>().Utf8Value();
     ul::ScrollEvent evt;
@@ -298,42 +285,42 @@ namespace nodegui {
       // methods
       InstanceMethod(
         "update",
-        &GUIFrame::update,
+        &GUIFrame::Update,
         napi_enumerable
       ),
       InstanceMethod(
         "render",
-        &GUIFrame::render,
+        &GUIFrame::Render,
         napi_enumerable
       ),
       InstanceMethod(
         "flush",
-        &GUIFrame::flush,
+        &GUIFrame::Flush,
         napi_enumerable
       ),
       InstanceMethod(
         "loadHTML",
-        &GUIFrame::loadHTML
+        &GUIFrame::LoadHTML
       ),
       InstanceMethod(
-        "getSharedHandle",
-        &GUIFrame::getSharedHandle
+        "getSharedHandleD3D11",
+        &GUIFrame::GetSharedHandleD3D11
       ),
       InstanceMethod(
         "dispatchBinaryBuffer",
-        &GUIFrame::dispatchBinaryBuffer
+        &GUIFrame::DispatchBinaryBuffer
       ),
       InstanceMethod(
         "dispatchMouseEvent",
-        &GUIFrame::dispatchMouseEvent
+        &GUIFrame::DispatchMouseEvent
       ),
       InstanceMethod(
         "dispatchKeyEvent",
-        &GUIFrame::dispatchKeyEvent
+        &GUIFrame::DispatchKeyEvent
       ),
       InstanceMethod(
         "dispatchScrollEvent",
-        &GUIFrame::dispatchScrollEvent
+        &GUIFrame::DispatchScrollEvent
       ),
       InstanceAccessor(
         "onbinarymessage",

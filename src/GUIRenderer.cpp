@@ -6,8 +6,6 @@
 
 namespace ul = ultralight;
 
-using Microsoft::WRL::ComPtr;
-
 namespace nodegui {
 
   GUIRenderer::GUIRenderer(GUIFrame* frame): frame_(frame) {

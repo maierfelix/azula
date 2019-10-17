@@ -26,6 +26,8 @@ namespace nodegui {
 
     ul::GPUContextD3D11* gpu_context();
 
+    Napi::Value GetSharedHandleD3D11(Napi::Env env);
+
   private:
     std::unique_ptr<ul::GPUContextD3D11> gpu_context_;
     ul::Config config;

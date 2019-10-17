@@ -12,6 +12,10 @@
 
 #include <Ultralight/Ultralight.h>
 
+#include <d3d11.h>
+#include <dxgi1_2.h>
+#include <wrl/client.h>
+
 #include "utils.h"
 
 namespace ul = ultralight;
@@ -36,6 +40,30 @@ namespace nodegui {
     platform.set_config(config);
     platform.set_gpu_driver(gpu_driver_.get());
     Initialize(platform);
+  }
+
+  Napi::Value GUIRendererD3D11::GetSharedHandleD3D11(Napi::Env env) {
+    HRESULT hr = S_OK;
+    ComPtr<IDXGIResource1> resource;
+
+    Flush();
+
+    ul::GPUDriverD3D11* gpu_driver = (ul::GPUDriverD3D11*) gpu_driver_.get();
+
+    uint32_t id = view()->render_target().render_buffer_id;
+    hr = gpu_driver->GetResolveTexture(id)->QueryInterface(__uuidof(IDXGIResource1), (void**)&resource);
+    if FAILED(hr) {
+      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to query interface", (LPCWSTR)L"D3D11 Error", MB_OK);
+      return env.Undefined();
+    }
+    HANDLE outputHandle;
+    hr = resource->CreateSharedHandle(nullptr, GENERIC_ALL, nullptr, &outputHandle);
+    if FAILED(hr) {
+      MessageBoxW(NULL, (LPCWSTR)L"D3D11 Error: Failed to create shared handle", (LPCWSTR)L"D3D11 Error", MB_OK);
+      return env.Undefined();
+    }
+
+    return Napi::BigInt::New(env, reinterpret_cast<uintptr_t>(outputHandle));
   }
 
   ul::GPUContextD3D11* GUIRendererD3D11::gpu_context() { assert(gpu_context_); return gpu_context_.get(); }

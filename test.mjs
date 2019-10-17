@@ -41,7 +41,11 @@ let win = new VulkanWindow({
   title: "NVK GUI"
 });
 
-let frame = new addon.GUIFrame();
+let frame = new addon.GUIFrame({
+  offscreen: true
+});
+
+let handleWin32 = frame.getSharedHandleD3D11();
 
 // forward window mouse events to GUI
 let currentButton = -1;
@@ -142,8 +146,6 @@ frame.loadHTML(`
   </script>
 `);
 frame.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
-
-let handle = frame.getSharedHandle();
 
 let device = new VkDevice();
 let instance = new VkInstance();
@@ -287,7 +289,7 @@ let instanceExtensions = win.getRequiredInstanceExtensions();
 
   let importMemoryWin32HandleInfoKHRInfo = new VkImportMemoryWin32HandleInfoKHR();
   importMemoryWin32HandleInfoKHRInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT;
-  importMemoryWin32HandleInfoKHRInfo.handle = handle;
+  importMemoryWin32HandleInfoKHRInfo.handle = handleWin32;
 
   let descMemoryAllocateInfo = new VkMemoryAllocateInfo();
   descMemoryAllocateInfo.pNext = importMemoryWin32HandleInfoKHRInfo;

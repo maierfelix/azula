@@ -3,15 +3,9 @@
 #define NAPI_EXPERIMENTAL
 #include <napi.h>
 
-#include <d3d11.h>
-#include <dxgi1_2.h>
-#include <wrl/client.h>
-
 #include "GUIRenderer.h"
 
 #include "utils.h"
-
-using Microsoft::WRL::ComPtr;
 
 namespace nodegui {
 
@@ -24,16 +18,18 @@ namespace nodegui {
 
     Napi::Env env_;
 
-    Napi::Value update(const Napi::CallbackInfo &info);
-    Napi::Value render(const Napi::CallbackInfo &info);
-    Napi::Value flush(const Napi::CallbackInfo &info);
-    Napi::Value loadHTML(const Napi::CallbackInfo &info);
-    Napi::Value getSharedHandle(const Napi::CallbackInfo &info);
+    Napi::Value Update(const Napi::CallbackInfo &info);
+    Napi::Value Render(const Napi::CallbackInfo &info);
+    Napi::Value Flush(const Napi::CallbackInfo &info);
+    Napi::Value LoadHTML(const Napi::CallbackInfo &info);
 
-    Napi::Value dispatchBinaryBuffer(const Napi::CallbackInfo &info);
-    Napi::Value dispatchMouseEvent(const Napi::CallbackInfo& info);
-    Napi::Value dispatchKeyEvent(const Napi::CallbackInfo& info);
-    Napi::Value dispatchScrollEvent(const Napi::CallbackInfo& info);
+    // shared resources for different platforms
+    Napi::Value GetSharedHandleD3D11(const Napi::CallbackInfo &info);
+
+    Napi::Value DispatchBinaryBuffer(const Napi::CallbackInfo &info);
+    Napi::Value DispatchMouseEvent(const Napi::CallbackInfo& info);
+    Napi::Value DispatchKeyEvent(const Napi::CallbackInfo& info);
+    Napi::Value DispatchScrollEvent(const Napi::CallbackInfo& info);
 
     // events passed in from GUIRenderer
     void OnDOMReady(ul::View* caller);
