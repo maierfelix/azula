@@ -71,7 +71,7 @@ import azula from "azula";
     - [Binary Messaging](#)
       - [dispatchBinaryBuffer](#windowprototypedispatchbinarybuffer)
       - [onbinarymessage](#windowprototypeonbinarymessage)
-    - [OSR](#)
+    - [OSR Mode](#)
       - [getSharedHandleD3D11](#windowprototypegetsharedhandled3d11)
 
 ## Window
@@ -94,6 +94,8 @@ let window = new azula.Window({
 });
 ````
 
+## General
+
 ### Window.prototype.title
 
 | Type | Description |
@@ -104,6 +106,24 @@ let window = new azula.Window({
 window.title = "My App";
 window.title; // "My App"
 ````
+
+### Window.prototype.update
+
+This method should be called to poll window events (making the window interactive). In *non-OSR* mode, this method also does the painting of the window.
+
+````js
+window.update();
+````
+
+### Window.prototype.flush
+
+This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and flushes the underlying context.
+
+````js
+window.flush();
+````
+
+## Loading
 
 ### Window.prototype.loadHTML
 
@@ -125,6 +145,8 @@ window.loadHTML("<button>Hello World!</button>");
 window.loadFile("./index.html");
 ````
 
+## Events
+
 ### Window.prototype.onresize
 
 | Type | Description |
@@ -141,6 +163,24 @@ The callback's Event parameter has the following structure:
 ````js
 window.onresize = e => {
   console.log(e.width, e.height);
+};
+````
+
+### Window.prototype.oncursorchange
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when the cursor should be changed |
+
+The callback's Event parameter has the following structure:
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| name | *String* | A name representing the cursor type to change to |
+
+````js
+window.oncursorchange = e => {
+  console.log(e.name);
 };
 ````
 
@@ -176,65 +216,7 @@ window.onconsolemessage = e => {
 };
 ````
 
-### Window.prototype.oncursorchange
-
-| Type | Description |
-| :--- | :--- |
-| *Function* | The function to call when the cursor should be changed |
-
-The callback's Event parameter has the following structure:
-
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| name | *String* | A name representing the cursor type to change to |
-
-````js
-window.oncursorchange = e => {
-  console.log(e.name);
-};
-````
-
-### Window.prototype.onbinarymessage
-
-The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
-
-The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
-
-| Type | Description |
-| :--- | :--- |
-| *Function* | The function to call when a binary message was sent from the GUI |
-
-The callback's Event parameter has the following structure:
-
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| buffer | *ArrayBuffer* | The ArrayBuffer sent from the GUI |
-| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the sent *buffer* |
-
-````js
-window.onbinarymessage = (buffer, args) => {
-  console.log(buffer, args);
-};
-````
-
-An equivalent method is available in the GUI.
-
-### Window.prototype.dispatchBinaryBuffer
-
-The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
-
-The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
-
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| buffer | *ArrayBuffer* | The ArrayBuffer to send to the GUI |
-| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the *buffer* |
-
-````js
-window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
-````
-
-An equivalent method is available in the GUI.
+## Event Dispatching
 
 ### Window.prototype.dispatchMouseEvent
 
@@ -262,27 +244,6 @@ window.dispatchMouseEvent("onmouseup", 16, 32, 1); // leave the left mouse butto
 window.dispatchMouseEvent("onmousemove", 16, 32, 0); // move the mouse to 16:32 without pressing a mouse button
 ````
 
-### Window.prototype.dispatchScrollEvent
-
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
-
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| type | *String* | The type of event |
-| deltaX | *Number* | The horizontal amount to scroll |
-| deltaY | *Number* | The vertical amount to scroll |
-
-The following event types are available:
-
-| Name | Type |
-| :--- | :--- |
-| onmousewheel | Simulating a mouse wheel action |
-
-````js
-window.dispatchScrollEvent("onmousewheel", 0, 1); // scroll upwards, vertically by 1
-window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizontally by -1
-````
-
 ### Window.prototype.dispatchKeyEvent
 
 The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
@@ -306,21 +267,72 @@ window.dispatchKeyEvent("onkeydown", x); // press a key
 window.dispatchKeyEvent("onkeyup", x); // leave a key
 ````
 
-### Window.prototype.update
+### Window.prototype.dispatchScrollEvent
 
-This method should be called to poll window events (making the window interactive). In *non-OSR* mode, this method also does the painting of the window.
+The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| type | *String* | The type of event |
+| deltaX | *Number* | The horizontal amount to scroll |
+| deltaY | *Number* | The vertical amount to scroll |
+
+The following event types are available:
+
+| Name | Type |
+| :--- | :--- |
+| onmousewheel | Simulating a mouse wheel action |
 
 ````js
-window.update();
+window.dispatchScrollEvent("onmousewheel", 0, 1); // scroll upwards, vertically by 1
+window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizontally by -1
 ````
 
-### Window.prototype.flush
+## Binary Messaging
 
-This method should only be used in [OSR](#osr) mode. Calling this method executes all remaining render operations and flushes the underlying context.
+### Window.prototype.dispatchBinaryBuffer
+
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+
+The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| buffer | *ArrayBuffer* | The ArrayBuffer to send to the GUI |
+| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the *buffer* |
 
 ````js
-window.flush();
+window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 ````
+
+An equivalent method is available in the GUI.
+
+### Window.prototype.onbinarymessage
+
+The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a shared buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
+
+The second argument is an Object (and is optional), which can be used to give some additional information about the `buffer` argument. This Object should be kept small, as it gets serialized behind the scenes, and so comes with some overhead.
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when a binary message was sent from the GUI |
+
+The callback's Event parameter has the following structure:
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| buffer | *ArrayBuffer* | The ArrayBuffer sent from the GUI |
+| args (*Optional*) | *Object* | An Used-defined Object providing additional information about the sent *buffer* |
+
+````js
+window.onbinarymessage = (buffer, args) => {
+  console.log(buffer, args);
+};
+````
+
+An equivalent method is available in the GUI.
+
+## OSR Related
 
 ### Window.prototype.getSharedHandleD3D11
 
