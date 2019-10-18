@@ -14,7 +14,7 @@ window.onbinarymessage = (buffer, args) => {
 
   // for each pixel we got sent
   // turn it into a div pixel, which is pretty inefficient
-  // but there is no canvas api
+  // but there is no canvas api (yet)
   let viewU8 = new Uint8Array(buffer);
   for (let ii = 0; ii < width * height; ++ii) {
     let x = (ii % width) | 0;
