@@ -250,9 +250,9 @@ window.onconsolemessage = e => {
 
 ## Event Dispatching
 
-### Window.prototype.dispatchMouseEvent
+The Event Dispatching System should only be used in [OSR](#osr) mode. Event Dispatching allows to manually send events to the GUI, such as mouse gestures or key events.
 
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+### Window.prototype.dispatchMouseEvent
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
@@ -277,8 +277,6 @@ window.dispatchMouseEvent("onmousemove", 16, 32, 0); // move the mouse to 16:32 
 
 ### Window.prototype.dispatchKeyEvent
 
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
-
 Key Codes are mapped towards [GLFW's Key Codes](https://www.glfw.org/docs/latest/group__keys.html).
 
 | Name | Type | Description |
@@ -299,8 +297,6 @@ window.dispatchKeyEvent("onkeyup", x); // leave a key
 ````
 
 ### Window.prototype.dispatchScrollEvent
-
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
