@@ -1,6 +1,7 @@
 {
   "name": "azula",
   "main": "index.js",
+  "types": "index.d.ts",
   "gypfile": false,
   "version": "0.1.4",
   "engines": {
