@@ -1,14 +1,14 @@
 export type MouseEventType =
   | "onmousedown"
   | "onmouseup"
-  | "onmousemove"
+  | "onmousemove";
 
 export type KeyEventType =
   | "onkeydown"
-  | "onkeyup"
+  | "onkeyup";
 
 export type ScrollEventType =
-  | "onmousewheel"
+  | "onmousewheel";
 
 export interface WindowOptions {
   width?: number;
