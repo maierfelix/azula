@@ -21,6 +21,9 @@ window.onobjectmessage = obj => {
     window.dispatchObject({ message: "PONG" });
   }, 750);
 };
+
+// when pressing this button,
+// we send a message to Node that the button was clicked
 clickme.onclick = e => {
   window.dispatchObject({ message: "A Button was pressed" });
 };
