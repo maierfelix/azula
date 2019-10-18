@@ -27,6 +27,12 @@ namespace nodegui {
     Napi::Value GetTitle(const Napi::CallbackInfo &info);
     void SetTitle(const Napi::CallbackInfo &info, const Napi::Value& value);
 
+    Napi::Value GetWidth(const Napi::CallbackInfo &info);
+    void SetWidth(const Napi::CallbackInfo &info, const Napi::Value& value);
+
+    Napi::Value GetHeight(const Napi::CallbackInfo &info);
+    void SetHeight(const Napi::CallbackInfo &info, const Napi::Value& value);
+
     Napi::Value LoadFile(const Napi::CallbackInfo &info);
     Napi::Value LoadHTML(const Napi::CallbackInfo &info);
 
@@ -72,12 +78,15 @@ namespace nodegui {
     Napi::Value Getonresize(const Napi::CallbackInfo &info);
     void Setonresize(const Napi::CallbackInfo &info, const Napi::Value& value);
 
-    uint32_t width = 640;
-    uint32_t height = 480;
+    uint32_t initialWidth = 640;
+    uint32_t initialHeight = 480;
 
     bool use_offscreen_rendering = false;
+
+    virtual GUIRenderer* renderer() { assert(renderer_); return renderer_.get(); }
+
   private:
-    std::unique_ptr<GUIRenderer> renderer;
+    std::unique_ptr<GUIRenderer> renderer_;
 
   };
 }

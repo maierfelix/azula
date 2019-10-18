@@ -23,58 +23,94 @@ namespace nodegui {
         use_offscreen_rendering = opts.Get("useOffscreenRendering").As<Napi::Boolean>().Value();
       }
       if (opts.Has("width")) {
-        width = opts.Get("width").As<Napi::Number>().Uint32Value();
+        initialWidth = opts.Get("width").As<Napi::Number>().Uint32Value();
       }
       if (opts.Has("height")) {
-        height = opts.Get("height").As<Napi::Number>().Uint32Value();
+        initialHeight = opts.Get("height").As<Napi::Number>().Uint32Value();
       }
     }
 
     if (use_offscreen_rendering) {
-      renderer = std::make_unique<GUIRendererD3D11>(this);
+      renderer_ = std::make_unique<GUIRendererD3D11>(this);
     }
     else {
-      renderer = std::make_unique<GUIRenderer>(this);
+      renderer_ = std::make_unique<GUIRenderer>(this);
     }
-
     // we can only change the title after creating the renderer (bc Im a lazy piece of shit)
     if (info[0].IsObject()) {
       Napi::Object opts = info[0].As<Napi::Object>();
       if (opts.Has("title")) {
-        renderer->SetTitle(opts.Get("title").As<Napi::String>().Utf8Value());
+        renderer()->SetTitle(opts.Get("title").As<Napi::String>().Utf8Value());
       }
     }
   }
   GUIFrame::~GUIFrame() {
-
+    if (!onbinarymessage.IsEmpty()) onbinarymessage.Reset();
+    if (!oncursorchange.IsEmpty()) oncursorchange.Reset();
+    if (!onconsolemessage.IsEmpty()) onconsolemessage.Reset();
+    if (!onresize.IsEmpty()) onresize.Reset();
   }
 
   Napi::Value GUIFrame::Update(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    renderer->Update();
+    renderer()->Update();
     return env.Undefined();
   }
 
   Napi::Value GUIFrame::Flush(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    renderer->Render();
-    renderer->Flush();
+    renderer()->Render();
+    renderer()->Flush();
     return env.Undefined();
   }
 
+  // title
   Napi::Value GUIFrame::GetTitle(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    return Napi::String::New(env, renderer->GetTitle());
+    return Napi::String::New(env, renderer()->GetTitle());
   }
-
   void GUIFrame::SetTitle(const Napi::CallbackInfo &info, const Napi::Value& value) {
     Napi::Env env = info.Env();
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Expected 'String' for argument 1").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Expected a 'String'").ThrowAsJavaScriptException();
     }
     else {
-      renderer->SetTitle(info[0].As<Napi::String>().Utf8Value());
+      renderer()->SetTitle(info[0].As<Napi::String>().Utf8Value());
     }
+  }
+
+  // width
+  Napi::Value GUIFrame::GetWidth(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    return Napi::Number::New(env, renderer()->view()->width());
+  }
+  void GUIFrame::SetWidth(const Napi::CallbackInfo &info, const Napi::Value& value) {
+    Napi::Env env = info.Env();
+    if (!value.IsNumber()) {
+      Napi::TypeError::New(env, "Expected a 'Number'").ThrowAsJavaScriptException();
+      return;
+    }
+    renderer()->Resize(
+      value.As<Napi::Number>().Uint32Value(),
+      renderer()->view()->height()
+    );
+  }
+
+  // height
+  Napi::Value GUIFrame::GetHeight(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    return Napi::Number::New(env, renderer()->view()->width());
+  }
+  void GUIFrame::SetHeight(const Napi::CallbackInfo &info, const Napi::Value& value) {
+    Napi::Env env = info.Env();
+    if (!value.IsNumber()) {
+      Napi::TypeError::New(env, "Expected a 'Number'").ThrowAsJavaScriptException();
+      return;
+    }
+    renderer()->Resize(
+      renderer()->view()->width(),
+      value.As<Napi::Number>().Uint32Value()
+    );
   }
 
   Napi::Value GUIFrame::LoadFile(const Napi::CallbackInfo& info) {
@@ -84,7 +120,7 @@ namespace nodegui {
       return env.Undefined();
     }
     std::string path = info[0].As<Napi::String>().Utf8Value();
-    renderer->LoadFile(path);
+    renderer()->LoadFile(path);
     return env.Undefined();
   }
 
@@ -95,7 +131,7 @@ namespace nodegui {
       return env.Undefined();
     }
     std::string html = info[0].As<Napi::String>().Utf8Value();
-    renderer->LoadHTML(html);
+    renderer()->LoadHTML(html);
     return env.Undefined();
   }
 
@@ -106,7 +142,7 @@ namespace nodegui {
       return Napi::BigInt::New(env, (uint64_t) 0);
     }
 #ifdef WIN32
-    GUIRendererD3D11* rendererD3D11 = (GUIRendererD3D11*) renderer.get();
+    GUIRendererD3D11* rendererD3D11 = (GUIRendererD3D11*) renderer();
     return rendererD3D11->GetSharedHandleD3D11(env);
 #else
     return Napi::BigInt::New(env, (uint64_t)0);
@@ -175,7 +211,7 @@ namespace nodegui {
       Napi::Error::New(env, "Invalid event type").ThrowAsJavaScriptException();
       return env.Undefined();
     }
-    renderer->view()->FireMouseEvent(evt);
+    renderer()->view()->FireMouseEvent(evt);
     return env.Undefined();
   }
 
@@ -195,7 +231,7 @@ namespace nodegui {
       return env.Undefined();
     }
     evt.virtual_key_code = GLFWKeyCodeToUltralightKeyCode(keyCode);
-    renderer->view()->FireKeyEvent(evt);
+    renderer()->view()->FireKeyEvent(evt);
     return env.Undefined();
   }
 
@@ -207,14 +243,14 @@ namespace nodegui {
     evt.delta_x = info[1].As<Napi::Number>().Uint32Value();
     evt.delta_y = info[2].As<Napi::Number>().Uint32Value();
 
-    renderer->view()->FireScrollEvent(evt);
+    renderer()->view()->FireScrollEvent(evt);
     return env.Undefined();
   }
 
   Napi::Value GUIFrame::ShouldClose(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     if (!use_offscreen_rendering) {
-      return Napi::Boolean::New(env, !renderer->app()->is_running());
+      return Napi::Boolean::New(env, !renderer()->app()->is_running());
     }
     return Napi::Boolean::New(env, false);
   }
@@ -223,7 +259,7 @@ namespace nodegui {
     ul::SetJSContext(caller->js_context());
     ul::JSObject global = ul::JSGlobalObject();
     ul::JSObject win = global["window"].ToObject();
-    win["dispatchBinaryBuffer"] = (ul::JSCallbackWithRetval)std::bind(&GUIRenderer::DispatchBinaryBuffer, renderer.get(), std::placeholders::_1, std::placeholders::_2);
+    win["dispatchBinaryBuffer"] = (ul::JSCallbackWithRetval)std::bind(&GUIRenderer::DispatchBinaryBuffer, renderer(), std::placeholders::_1, std::placeholders::_2);
   }
 
   void GUIFrame::OnChangeCursor(ul::View* caller, ul::Cursor cursor) {
@@ -299,10 +335,8 @@ namespace nodegui {
     return ul::JSValue(undefined);
   };
 
-  void GUIFrame::OnResize(uint32_t width_, uint32_t height_) {
+  void GUIFrame::OnResize(uint32_t width, uint32_t height) {
     Napi::Env env = env_;
-    width = width_;
-    height = height_;
     if (onresize.IsEmpty()) return;
     Napi::Object out = Napi::Object::New(env);
     out.Set("width", Napi::Number::New(env, width));
@@ -380,6 +414,18 @@ namespace nodegui {
         "title",
         &GUIFrame::GetTitle,
         &GUIFrame::SetTitle,
+        napi_enumerable
+      ),
+      InstanceAccessor(
+        "width",
+        &GUIFrame::GetWidth,
+        &GUIFrame::SetWidth,
+        napi_enumerable
+      ),
+      InstanceAccessor(
+        "height",
+        &GUIFrame::GetHeight,
+        &GUIFrame::SetHeight,
         napi_enumerable
       ),
       InstanceMethod(

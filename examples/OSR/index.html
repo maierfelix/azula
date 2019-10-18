@@ -87,7 +87,6 @@ window.onbinarymessage = (buf, args) => {
   setTimeout(() => {
     new Uint8Array(buf)[0] = (Math.random() * 255) | 0;
     args.kind = 42;
-    console.log(buf);
     window.dispatchBinaryBuffer(buf, args);
   }, 1e3);
 };

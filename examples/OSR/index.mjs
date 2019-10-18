@@ -37,8 +37,7 @@ let result = VK_SUCCESS;
 let win = new VulkanWindow({
   width: 512,
   height: 512,
-  title: "NVK GUI",
-  resizable: false
+  title: "NVK GUI"
 });
 
 let gui = new azula.Window({
@@ -46,6 +45,13 @@ let gui = new azula.Window({
   height: win.height,
   useOffscreenRendering: true
 });
+
+win.onresize = e => {
+  gui.width = e.width;
+  gui.height = e.height;
+};
+
+win.width += 32;
 
 let handleWin32 = gui.getSharedHandleD3D11();
 
@@ -89,7 +95,7 @@ gui.onconsolemessage = e => {
 gui.onbinarymessage = (buffer, args) => {
   setTimeout(() => {
     args.kind = 666;
-    console.log(buffer);
+    //console.log(buffer);
     gui.dispatchBinaryBuffer(buffer, args);
   }, 1e3);
 };

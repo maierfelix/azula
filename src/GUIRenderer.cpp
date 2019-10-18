@@ -8,12 +8,12 @@ namespace ul = ultralight;
 
 namespace nodegui {
 
-  GUIRenderer::GUIRenderer(GUIFrame* frame_): frame_(frame_) {
+  GUIRenderer::GUIRenderer(GUIFrame* frame_): frame_(frame_), use_offscreen_rendering_(frame_->use_offscreen_rendering) {
     // create a window if offscreen rendering is not enabled
-    if (!frame()->use_offscreen_rendering) {
+    if (!use_offscreen_rendering_) {
       app_ = ul::App::Create();
 
-      window_ = ul::Window::Create(app()->main_monitor(), frame()->width, frame()->height, false, ul::kWindowFlags_Titled | ul::kWindowFlags_Resizable);
+      window_ = ul::Window::Create(app()->main_monitor(), frame()->initialWidth, frame()->initialHeight, false, ul::kWindowFlags_Titled | ul::kWindowFlags_Resizable);
       app()->set_window(*window_.get());
 
       overlay_ = ul::Overlay::Create(*window_.get(), window_->width(), window_->height(), 0, 0);
@@ -24,6 +24,18 @@ namespace nodegui {
       window_->set_listener(this);
       app()->set_is_running(true);
     }
+  }
+
+  void GUIRenderer::Initialize(ul::Platform& platform) {
+    platform.set_font_loader(font_loader());
+    platform.set_file_system(file_system());
+    renderer_ = ul::Renderer::Create();
+
+    view_ = renderer_->CreateView(frame()->initialWidth, frame()->initialHeight, true);
+    view()->set_load_listener(this);
+    view()->set_view_listener(this);
+
+    view()->LoadHTML("");
   }
 
   void GUIRenderer::OnDOMReady(ul::View* caller) {
@@ -52,34 +64,21 @@ namespace nodegui {
 
   void GUIRenderer::OnResize(uint32_t width, uint32_t height) {
     frame()->OnResize(width, height);
-    overlay()->Resize(width, height);
+    if (!use_offscreen_rendering_) {
+      overlay()->Resize(width, height);
+    }
   }
 
   ul::JSValue GUIRenderer::DispatchBinaryBuffer(const ul::JSObject& thisObject, const ul::JSArgs& info) {
     return frame()->OnDispatchBinaryBuffer(thisObject, info);
   }
 
-  void GUIRenderer::Initialize(ul::Platform& platform) {
-    platform.set_font_loader(font_loader());
-    platform.set_file_system(file_system());
-    renderer_ = ul::Renderer::Create();
-
-    view_ = renderer_->CreateView(frame()->width, frame()->height, true);
-    view()->set_load_listener(this);
-    view()->set_view_listener(this);
-
-    view()->LoadHTML("");
-    // called initially so we can take a shared handle immediately
-    Update();
-    Render();
-  }
-
   void GUIRenderer::Flush() {
-    if (!frame()->use_offscreen_rendering) return;
+    if (!use_offscreen_rendering_) return;
   }
 
   void GUIRenderer::Update() {
-    if (frame()->use_offscreen_rendering) {
+    if (use_offscreen_rendering_) {
       renderer()->Update();
     }
     else {
@@ -88,7 +87,7 @@ namespace nodegui {
   }
 
   void GUIRenderer::Render() {
-    if (!frame()->use_offscreen_rendering) return;
+    if (!use_offscreen_rendering_) return;
     renderer()->Update();
     renderer()->Render();
     if (gpu_driver()->HasCommandsPending()) {
@@ -109,37 +108,31 @@ namespace nodegui {
   }
 
   std::string GUIRenderer::GetTitle() {
-    if (frame()->use_offscreen_rendering) return "";
+    if (use_offscreen_rendering_) return "";
     return title_;
   }
 
   void GUIRenderer::SetTitle(std::string& title) {
-    if (frame()->use_offscreen_rendering) return;
+    if (use_offscreen_rendering_) return;
     title_ = title;
     window()->SetTitle(title_.c_str());
   }
 
+  void GUIRenderer::Resize(uint32_t width, uint32_t height) {
+
+  }
+
   void GUIRenderer::LoadFile(std::string& path) {
     std::string filePath = "file:///" + path;
-    if (frame()->use_offscreen_rendering) {
-      view()->LoadURL(filePath.c_str());
-    }
-    else {
-      overlay()->view()->LoadURL(filePath.c_str());
-    }
+    view()->LoadURL(filePath.c_str());
   }
 
   void GUIRenderer::LoadHTML(std::string& html) {
-    if (frame()->use_offscreen_rendering) {
-      view()->LoadHTML(html.c_str());
-    }
-    else {
-      overlay()->view()->LoadHTML(html.c_str());
-    }
+    view()->LoadHTML(html.c_str());
   }
 
   void GUIRenderer::UpdateGeometry() {
-    if (!frame()->use_offscreen_rendering) return;
+    if (!use_offscreen_rendering_) return;
 
     bool initial_creation = false;
     ul::RenderTarget target = view()->render_target();
@@ -155,8 +148,8 @@ namespace nodegui {
       memset(&gpu_state_, 0, sizeof(gpu_state_));
       ul::Matrix identity;
       identity.SetIdentity();
-      gpu_state_.viewport_width = frame()->width;
-      gpu_state_.viewport_height = frame()->height;
+      gpu_state_.viewport_width = view()->width();
+      gpu_state_.viewport_height = view()->height();
       gpu_state_.transform = identity.GetMatrix4x4();
       gpu_state_.enable_blend = true;
       gpu_state_.enable_texturing = true;
@@ -181,8 +174,8 @@ namespace nodegui {
 
     float left = 0.0f;
     float top = 0.0f;
-    float right = frame()->width;
-    float bottom = frame()->height;
+    float right = view()->width();
+    float bottom = view()->height();
 
     // TOP LEFT
     v.pos[0] = v.obj[0] = left;

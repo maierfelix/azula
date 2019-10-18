@@ -23,6 +23,7 @@ namespace nodegui {
     void Flush() override;
     void BeginDrawing() override;
     void EndDrawing() override;
+    void Resize(uint32_t width, uint32_t height) override;
 
     ul::GPUContextD3D11* gpu_context() { assert(gpu_context_); return gpu_context_.get(); }
 
@@ -35,10 +36,6 @@ namespace nodegui {
     uint32_t geometry_id;
     std::vector<ul::Vertex_2f_4ub_2f_2f_28f> vertices;
     std::vector<ul::IndexType> indices;
-
-    ul::GPUState gpu_state;
-
-    bool needs_update = true;
   };
 
 }

@@ -36,7 +36,7 @@ namespace nodegui {
 
     gpu_context_ = std::make_unique<ul::GPUContextD3D11>();
     if (frame()->use_offscreen_rendering) {
-      gpu_context()->Initialize(NULL, frame()->width, frame()->height, 1.0, false, true, true, 4);
+      gpu_context()->Initialize(NULL, frame()->initialWidth, frame()->initialHeight, 1.0, false, true, true, 4);
     }
     gpu_driver_ = std::make_unique<ul::GPUDriverD3D11>(gpu_context());
 
@@ -49,6 +49,8 @@ namespace nodegui {
   Napi::Value GUIRendererD3D11::GetSharedHandleD3D11(Napi::Env env) {
     HRESULT hr = S_OK;
 
+    Update();
+    Render();
     Flush();
 
     ul::GPUDriverD3D11* gpu_driver_d3d11 = (ul::GPUDriverD3D11*) gpu_driver();
@@ -68,6 +70,29 @@ namespace nodegui {
     }
 
     return Napi::BigInt::New(env, reinterpret_cast<uintptr_t>(outputHandle));
+  }
+
+  void GUIRendererD3D11::Resize(uint32_t width, uint32_t height) {
+    if (view()->width() == width && view()->height() == height) return;
+
+    D3D11_VIEWPORT vp;
+    ZeroMemory(&vp, sizeof(vp));
+    vp.Width = (float) width;
+    vp.Height = (float) width;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+    gpu_context()->immediate_context()->RSSetViewports(1, &vp);
+
+    view()->Resize(width, height);
+
+    needs_update_ = true;
+    UpdateGeometry();
+
+    ul::RenderTarget target = view()->render_target();
+    gpu_state_.render_buffer_id = view()->render_target().render_buffer_id;
+    gpu_state_.texture_1_id = target.texture_id;
   }
 
   void GUIRendererD3D11::Flush() {

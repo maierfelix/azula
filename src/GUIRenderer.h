@@ -26,6 +26,7 @@ namespace nodegui {
     virtual ~GUIRenderer() {}
 
     virtual void Initialize(ul::Platform& platform);
+
     virtual void Update();
     virtual void Render();
 
@@ -35,6 +36,7 @@ namespace nodegui {
 
     virtual std::string GetTitle();
     virtual void SetTitle(std::string& title);
+    virtual void Resize(uint32_t width, uint32_t height);
     virtual void LoadHTML(std::string& html);
     virtual void LoadFile(std::string& path);
 
@@ -60,7 +62,16 @@ namespace nodegui {
     virtual GUIFrame* frame() { assert(frame_.get()); return frame_.get(); }
 
     virtual ul::RefPtr<ul::App> app() { assert(app_.get()); return app_.get(); }
-    virtual ul::RefPtr<ul::View> view() { assert(view_.get()); return view_.get(); }
+    virtual ul::RefPtr<ul::View> view() {
+      if (use_offscreen_rendering_) {
+        assert(view_.get());
+        return view_.get();
+      }
+      else {
+        assert(overlay()->view().ptr());
+        return overlay()->view();
+      }
+    }
     virtual ul::RefPtr<ul::Window> window() { assert(window_.get()); return window_.get(); }
     virtual ul::RefPtr<ul::Overlay> overlay() { assert(overlay_.get()); return overlay_.get(); }
     virtual ul::RefPtr<ul::Renderer> renderer() { assert(renderer_.get()); return renderer_.get(); }
@@ -82,16 +93,16 @@ namespace nodegui {
     std::unique_ptr<ul::FontLoader> font_loader_;
     std::unique_ptr<ul::FileSystem> file_system_;
 
-  private:
+    bool needs_update_ = true;
+    bool use_offscreen_rendering_ = false;
 
     uint32_t geometry_id_;
     ul::GPUState gpu_state_;
+  private:
     std::vector<ul::Vertex_2f_4ub_2f_2f_28f> vertices_;
     std::vector<ul::IndexType> indices_;
 
     std::string title_;
-
-    bool needs_update_ = true;
   };
 
 }
