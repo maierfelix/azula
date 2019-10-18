@@ -19,7 +19,7 @@
 
 *azula* is a lightweight GPU accelerated HTML GUI for Node. It is based on [Ultralight](https://github.com/ultralight-ux/Ultralight), which is an embedding friendly Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
 
-*azula* can optionally run in [OSR](#osr) mode, which makes it easy to embed *azula* in Game or VR engines written in JavaScript.
+*azula* can optionally run in [OSR](#osr) mode, which makes it easy to embed *azula* in existing Projects like Game/VR Engines.
 
 ## Characteristics
 
@@ -43,7 +43,7 @@
 
 ## Getting Started
 
-Install azula using:
+Install *azula* using:
 ````
 npm install azula
 ````
