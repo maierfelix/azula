@@ -1,14 +1,14 @@
 {
   "name": "azula",
   "main": "index.js",
+  "gypfile": false,
   "version": "0.1.2",
   "engines": {
     "node": ">= 10.9.0"
   },
   "config": {},
   "scripts": {
-    "build": "node ./build.js",
-    "install": "node-gyp rebuild"
+    "build": "node ./build.js"
   },
   "devDependencies": {
     "nvk": "latest",

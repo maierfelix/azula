@@ -35,18 +35,15 @@
             ],
             "include_dirs": [
               "<!@(node -p \"require('node-addon-api').include\")",
-              "<(root)/third_party/include/",
-              "<(vkSDK)/include",
+              "<(root)/third_party/include/"
             ],
             "library_dirs": [
-              "<(root)/third_party/lib/<(build)/<(platform)/<(target_arch)/*",
-              "<(vkSDK)/lib",
+              "<(root)/third_party/lib/<(build)/<(platform)/<(target_arch)/*"
             ],
             "link_settings": {
               "libraries": [
                 "D3DCompiler.lib",
                 "d3d11.lib",
-                "vulkan-1.lib",
                 "AppCore.lib",
                 "Ultralight.lib",
                 "UltralightCore.lib",

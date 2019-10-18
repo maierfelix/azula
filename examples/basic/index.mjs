@@ -2,8 +2,8 @@ import fs from "fs";
 import azula from "azula";
 
 let window = new azula.Window({
-  width: 480,
-  height: 320,
+  width: 512,
+  height: 512,
   title: "azula",
   useOffscreenRendering: false
 });

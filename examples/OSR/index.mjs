@@ -51,8 +51,6 @@ win.onresize = e => {
   gui.height = e.height;
 };
 
-win.width += 32;
-
 let handleWin32 = gui.getSharedHandleD3D11();
 
 // forward window mouse events to GUI
@@ -95,7 +93,7 @@ gui.onconsolemessage = e => {
 gui.onbinarymessage = (buffer, args) => {
   setTimeout(() => {
     args.kind = 666;
-    //console.log(buffer);
+    console.log(buffer);
     gui.dispatchBinaryBuffer(buffer, args);
   }, 1e3);
 };
