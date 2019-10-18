@@ -90,10 +90,10 @@ When creating a new Window, the following parameters are available:
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| width | *Number* | The initial width of the window |
-| height | *Number* | The initial height of the window |
-| title | *String* | The initial title of the window |
-| useOffscreenRendering | *Boolean* | When *true*, creates the window in [OSR mode](#osr) |
+| width (*Optional*) | *Number* | The initial width of the window |
+| height (*Optional*) | *Number* | The initial height of the window |
+| title (*Optional*) | *String* | The initial title of the window |
+| useOffscreenRendering (*Optional*) | *Boolean* | When *true*, creates the window in [OSR mode](#osr) |
 
 ````js
 let window = new azula.Window({
