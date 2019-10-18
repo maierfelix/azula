@@ -403,5 +403,5 @@ Pricing plans for larger commercial projects will be announced later.
 
 For further information regaring the licensing of Ultralight, see [this](https://github.com/ultralight-ux/Ultralight/tree/master/license) link.
 
-## 
+## ‌‌
 *Named after the fictional character [Azula](https://en.wikipedia.org/wiki/Azula) in the Avatar Series*
