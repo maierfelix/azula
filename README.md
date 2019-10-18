@@ -4,7 +4,7 @@
   </a>
   <br/>
   <br/>
-  Lightweight GPU accelerated HTML GUI for Node
+  <i>Azula</i>, a lightweight GPU accelerated HTML GUI for Node
   <br/>
   <br/>
   <a href="https://www.npmjs.com/package/azula">
@@ -15,11 +15,21 @@
   <img src="https://i.imgur.com/bfwxryC.gif" />
 </p>
 
-#
+## ‌‌
 
-*azula* is a lightweight GPU accelerated HTML GUI for Node. This project uses [Ultralight](https://github.com/ultralight-ux/Ultralight), which is an embedding friendly Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
+*azula* is a lightweight GPU accelerated HTML GUI for Node. It is based on [Ultralight](https://github.com/ultralight-ux/Ultralight), which is an embedding friendly Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
 
-*azula* can optionally run in [OSR](#OSR) mode, which makes it easy to embed *azula* in Game or VR engines written in JavaScript.
+*azula* can optionally run in [OSR](#osr) mode, which makes it easy to embed *azula* in Game or VR engines written in JavaScript.
+
+## Characteristics
+
+*azula* can be used as an alternative to Electron.
+
+|  | Azula | Electron |
+| :--- | :--- | :--- |
+| CPU | 1.2% | 4.2% |
+| RAM | 37Mb | 64Mb |
+| DISK | 31Mb | 118Mb |
 
 ## Platforms
 
