@@ -19,7 +19,7 @@
 
 *azula* is a lightweight GPU accelerated HTML GUI for Node. This project uses [Ultralight](https://github.com/ultralight-ux/Ultralight), which is an embedding friendly Fork of [WebKit](https://webkit.org/), with less memory usage and low disk space requirements.
 
-*azula* can optionally run in [OSR](#OSR) mode, which makes it easy to embed *azula* in game engines or VR engines written in JavaScript.
+*azula* can optionally run in [OSR](#OSR) mode, which makes it easy to embed *azula* in Game or VR engines written in JavaScript.
 
 ## Platforms
 
@@ -52,6 +52,8 @@ import azula from "azula";
   * [Window](#window)
     - [General](#general)
       - [title](#windowprototypetitle)
+      - [width](#windowprototypewidth)
+      - [height](#windowprototypeheight)
       - [update](#windowprototypeupdate)
       - [flush](#windowprototypeflush)
       - [shouldClose](#windowprototypeshouldclose)
@@ -103,6 +105,28 @@ let window = new azula.Window({
 ````js
 window.title = "My App";
 window.title; // "My App"
+````
+
+### Window.prototype.width
+
+| Type | Description |
+| :--- | :--- |
+| *Number* | A getter/setter allowing to retrieve or update the width of the window |
+
+````js
+window.width = 640;
+window.width; // 640
+````
+
+### Window.prototype.height
+
+| Type | Description |
+| :--- | :--- |
+| *Number* | A getter/setter allowing to retrieve or update the height of the window |
+
+````js
+window.height = 480;
+window.height; // 480
 ````
 
 ### Window.prototype.update
@@ -226,9 +250,9 @@ window.onconsolemessage = e => {
 
 ## Event Dispatching
 
-### Window.prototype.dispatchMouseEvent
+The Event Dispatching System should only be used in [OSR](#osr) mode. Event Dispatching allows to manually send events to the GUI, such as mouse gestures or key events.
 
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
+### Window.prototype.dispatchMouseEvent
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
@@ -253,8 +277,6 @@ window.dispatchMouseEvent("onmousemove", 16, 32, 0); // move the mouse to 16:32 
 
 ### Window.prototype.dispatchKeyEvent
 
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
-
 Key Codes are mapped towards [GLFW's Key Codes](https://www.glfw.org/docs/latest/group__keys.html).
 
 | Name | Type | Description |
@@ -275,8 +297,6 @@ window.dispatchKeyEvent("onkeyup", x); // leave a key
 ````
 
 ### Window.prototype.dispatchScrollEvent
-
-The *dispatchXEvent* system should only be used in [OSR](#osr) mode. It allows to manually send events, such as mouse gestures or key events to the GUI.
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
