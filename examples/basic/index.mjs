@@ -14,18 +14,6 @@ window.onconsolemessage = e => {
   e.callee.apply(console, [e.message, loc]);
 };
 
-window.onbinarymessage = (buffer, args) => {
-  setTimeout(() => {
-    args.kind = 666;
-    console.log(buffer);
-    window.dispatchBinaryBuffer(buffer, args);
-  }, 1e3);
-};
-
-window.onresize = e => {
-  console.log(e.width, e.height);
-};
-
 window.loadHTML(fs.readFileSync("./index.html", "utf8"));
 
 (function updateLoop() {
