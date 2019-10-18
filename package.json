@@ -2,7 +2,7 @@
   "name": "azula",
   "main": "index.js",
   "gypfile": false,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "engines": {
     "node": ">= 10.9.0"
   },
@@ -34,5 +34,8 @@
   "bugs": {
     "url": "https://github.com/maierfelix/azula/issues"
   },
-  "homepage": "https://github.com/maierfelix/azula#readme"
+  "homepage": "https://github.com/maierfelix/azula#readme",
+  "directories": {
+    "example": "examples"
+  }
 }
