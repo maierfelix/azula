@@ -1,0 +1,116 @@
+<style>
+  body {
+    font-family: Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI","Oxygen","Ubuntu","Cantarell","Open Sans",sans-serif;
+    background-color: rgba(0,0,0,0.05);
+    ul {
+      padding: 0;
+      margin: 5px 0 5px;
+      li {
+        list-style: none;
+        margin: 10px 0 10px;
+      }
+    }
+  }
+  button {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,0,0,0.175);
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  input {
+    border: 1px solid rgba(0,0,0,0.175);
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+</style>
+
+<div id="root"></div>
+
+<script type="text/javascript" src="https://unpkg.com/react/umd/react.development.js"></script>
+<script type="text/javascript" src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+
+<script>
+
+  class TodoList extends React.Component {
+    constructor(props) {
+      super(props);
+    }
+    removeItem(item, i) {
+      this.props.removeTodo(item, i);
+    }
+    render() {
+      return (React.createElement("div", null, React.createElement("ul", null, this.props.entries.map((todo, i) => {
+        return (React.createElement("li", null, todo, " ", React.createElement("button", {
+          onClick: () => {
+            this.removeItem(todo, i);
+          },
+          key: i
+        }, " ", "Delete", " ")));
+      }))));
+    }
+  }
+
+  class Todos extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        tasks: []
+      };
+      this.addTask = this.addTask.bind(this);
+      this.removeTask = this.removeTask.bind(this);
+    }
+    // setup the add handler
+    addTask(event) {
+      event.preventDefault();
+      var taskArray = this.state.tasks;
+      // grab input text value
+      var newTaskInput = this.refs.newTask.value;
+      // add new text value to task array
+      taskArray.push(newTaskInput);
+      this.setState({
+        tasks: taskArray
+      });
+      //clear form box after submit
+      this.refs.newTask.value = "";
+    }
+    // setup the remove handler
+    removeTask(name, i) {
+      var tasks = this.state.tasks.slice();
+      // remove task at index
+      tasks.splice(i, 1);
+      //update task array
+      this.setState({
+        tasks
+      });
+    }
+    render() {
+      return (React.createElement("div", null, React.createElement("form", {
+        onSubmit: this.addTask
+      }, React.createElement("input", {
+        type: "text",
+        placeholder: "Enter New Task",
+        ref: "newTask"
+      }), React.createElement("button", {
+        type: "submit"
+      }, "add")), React.createElement(TodoList, {
+        entries: this.state.tasks,
+        removeTodo: this.removeTask
+      })));
+    }
+  }
+
+  class App extends React.Component {
+    render() {
+      return (
+        React.createElement("div", {
+        className: "app container"
+      }, React.createElement("div", {
+        className: "title"
+      }, React.createElement("h1", null, "React Todo App"), React.createElement(Todos, null)))
+      );
+    }
+  }
+
+  const element = React.createElement(App, null);
+  ReactDOM.render(element, root);
+</script>
