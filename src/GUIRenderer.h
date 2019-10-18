@@ -43,6 +43,7 @@ namespace nodegui {
     virtual void UpdateGeometry();
 
     ul::JSValue DispatchBinaryBuffer(const ul::JSObject& thisObject, const ul::JSArgs& args);
+    ul::JSValue DispatchObject(const ul::JSObject& thisObject, const ul::JSArgs& args);
 
     virtual void OnDOMReady(ul::View* caller);
     virtual void OnChangeCursor(ul::View* caller, ul::Cursor cursor);

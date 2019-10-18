@@ -24,12 +24,11 @@ namespace nodegui {
     Napi::Value Update(const Napi::CallbackInfo &info);
     Napi::Value Flush(const Napi::CallbackInfo &info);
 
+    // general getter/setter
     Napi::Value GetTitle(const Napi::CallbackInfo &info);
     void SetTitle(const Napi::CallbackInfo &info, const Napi::Value& value);
-
     Napi::Value GetWidth(const Napi::CallbackInfo &info);
     void SetWidth(const Napi::CallbackInfo &info, const Napi::Value& value);
-
     Napi::Value GetHeight(const Napi::CallbackInfo &info);
     void SetHeight(const Napi::CallbackInfo &info, const Napi::Value& value);
 
@@ -39,10 +38,12 @@ namespace nodegui {
     // shared resources for different platforms
     Napi::Value GetSharedHandleD3D11(const Napi::CallbackInfo &info);
 
-    Napi::Value DispatchBinaryBuffer(const Napi::CallbackInfo &info);
+    // messaging
     Napi::Value DispatchMouseEvent(const Napi::CallbackInfo& info);
     Napi::Value DispatchKeyEvent(const Napi::CallbackInfo& info);
     Napi::Value DispatchScrollEvent(const Napi::CallbackInfo& info);
+    Napi::Value DispatchBinaryBuffer(const Napi::CallbackInfo &info);
+    Napi::Value DispatchObject(const Napi::CallbackInfo &info);
 
     Napi::Value ShouldClose(const Napi::CallbackInfo &info);
 
@@ -59,21 +60,22 @@ namespace nodegui {
       const ul::String& source_id
     );
     void OnResize(uint32_t width, uint32_t height);
-
     ul::JSValue OnDispatchBinaryBuffer(const ul::JSObject& thisObject, const ul::JSArgs& args);
+    ul::JSValue OnDispatchObject(const ul::JSObject& thisObject, const ul::JSArgs& args);
 
+    // callback function getter/setter
     Napi::FunctionReference onbinarymessage;
     Napi::Value Getonbinarymessage(const Napi::CallbackInfo &info);
     void Setonbinarymessage(const Napi::CallbackInfo &info, const Napi::Value& value);
-
+    Napi::FunctionReference onobjectmessage;
+    Napi::Value Getonobjectmessage(const Napi::CallbackInfo &info);
+    void Setonobjectmessage(const Napi::CallbackInfo &info, const Napi::Value& value);
     Napi::FunctionReference oncursorchange;
     Napi::Value Getoncursorchange(const Napi::CallbackInfo &info);
     void Setoncursorchange(const Napi::CallbackInfo &info, const Napi::Value& value);
-
     Napi::FunctionReference onconsolemessage;
     Napi::Value Getonconsolemessage(const Napi::CallbackInfo &info);
     void Setonconsolemessage(const Napi::CallbackInfo &info, const Napi::Value& value);
-
     Napi::FunctionReference onresize;
     Napi::Value Getonresize(const Napi::CallbackInfo &info);
     void Setonresize(const Napi::CallbackInfo &info, const Napi::Value& value);

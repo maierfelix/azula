@@ -46,6 +46,7 @@ namespace nodegui {
   }
   GUIFrame::~GUIFrame() {
     if (!onbinarymessage.IsEmpty()) onbinarymessage.Reset();
+    if (!onobjectmessage.IsEmpty()) onobjectmessage.Reset();
     if (!oncursorchange.IsEmpty()) oncursorchange.Reset();
     if (!onconsolemessage.IsEmpty()) onconsolemessage.Reset();
     if (!onresize.IsEmpty()) onresize.Reset();
@@ -160,7 +161,12 @@ namespace nodegui {
       free(bytes);
     };
 
-    if (info.Length() >= 1 && info[0].IsObject() && win["onbinarymessage"].IsFunction()) {
+    if (info.Length() == 0 || (!info[0].IsObject())) {
+      Napi::TypeError::New(env, "Expected 'Object' for argument 1").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    if (win["onbinarymessage"].IsFunction()) {
       Napi::ArrayBuffer buf = info[0].As<Napi::ArrayBuffer>();
       void* data = buf.Data();
       size_t size = buf.ByteLength();
@@ -180,6 +186,34 @@ namespace nodegui {
       else if (ret.IsNumber()) return Napi::Number::New(env, ret.ToNumber());
       else {
         Napi::TypeError::New(env, "'onbinarymessage' returned an invalid type").ThrowAsJavaScriptException();
+        return env.Undefined();
+      }
+    }
+
+    return env.Undefined();
+  }
+
+  Napi::Value GUIFrame::DispatchObject(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    JSContextRef ctx = ul::GetJSContext();
+
+    ul::JSObject global = ul::JSGlobalObject();
+    ul::JSObject win = global["window"].ToObject();
+
+    if (info.Length() == 0 || (!info[0].IsObject())) {
+      Napi::TypeError::New(env, "Expected 'Object' for argument 1").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    if (win["onobjectmessage"].IsFunction()) {
+      ul::JSValue ret;
+      JSValueRef args = ConvertNAPI2JSCObject(env, info[0]);
+      ret = win["onobjectmessage"].ToFunction()({ args });
+      if (ret.IsUndefined()) return env.Undefined();
+      else if (ret.IsBoolean()) return Napi::Boolean::New(env, ret.ToBoolean());
+      else if (ret.IsNumber()) return Napi::Number::New(env, ret.ToNumber());
+      else {
+        Napi::TypeError::New(env, "'onobjectmessage' returned an invalid type").ThrowAsJavaScriptException();
         return env.Undefined();
       }
     }
@@ -260,6 +294,7 @@ namespace nodegui {
     ul::JSObject global = ul::JSGlobalObject();
     ul::JSObject win = global["window"].ToObject();
     win["dispatchBinaryBuffer"] = (ul::JSCallbackWithRetval)std::bind(&GUIRenderer::DispatchBinaryBuffer, renderer(), std::placeholders::_1, std::placeholders::_2);
+    win["dispatchObject"] = (ul::JSCallbackWithRetval)std::bind(&GUIRenderer::DispatchObject, renderer(), std::placeholders::_1, std::placeholders::_2);
   }
 
   void GUIFrame::OnChangeCursor(ul::View* caller, ul::Cursor cursor) {
@@ -312,8 +347,6 @@ namespace nodegui {
       void* data = JSObjectGetArrayBufferBytesPtr(ctx, info[0], NULL);
       size_t size = JSObjectGetArrayBufferByteLength(ctx, info[0], NULL);
 
-      Napi::Object out = Napi::Object::New(env);
-
       Napi::ArrayBuffer buffer = Napi::ArrayBuffer::New(env, data, size);
 
       Napi::Value ret;
@@ -328,6 +361,31 @@ namespace nodegui {
       else if (ret.IsNumber()) return ul::JSValue(ret.As<Napi::Number>().Int32Value());
       else {
         Napi::TypeError::New(env, "'onbinarymessage' returned an invalid type").ThrowAsJavaScriptException();
+        return ul::JSValue(undefined);
+      }
+    }
+
+    return ul::JSValue(undefined);
+  };
+
+  ul::JSValue GUIFrame::OnDispatchObject(const ul::JSObject& thisObject, const ul::JSArgs& info) {
+    Napi::Env env = env_;
+    JSContextRef ctx = ul::GetJSContext();
+    ul::JSValueUndefinedTag undefined;
+
+    if (info.size() == 0 || (!info[0].IsObject())) {
+      Napi::TypeError::New(env, "Expected 'Object' for argument 1").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    if (!(onobjectmessage.IsEmpty())) {
+      Napi::Value ret = onobjectmessage.Value().As<Napi::Function>().Call({ ConvertJSC2NAPIObject(env, info[0]) });
+
+      if (ret.IsUndefined()) return ul::JSValue(undefined);
+      else if (ret.IsBoolean()) return ul::JSValue(ret.As<Napi::Boolean>().Value());
+      else if (ret.IsNumber()) return ul::JSValue(ret.As<Napi::Number>().Int32Value());
+      else {
+        Napi::TypeError::New(env, "'onobjectmessage' returned an invalid type").ThrowAsJavaScriptException();
         return ul::JSValue(undefined);
       }
     }
@@ -354,7 +412,20 @@ namespace nodegui {
     Napi::Env env = info.Env();
     if (value.IsFunction()) this->onbinarymessage.Reset(value.As<Napi::Function>(), 1);
     else if (value.IsNull()) this->onbinarymessage.Reset();
-    else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
+    else Napi::TypeError::New(env, "Value must be of type 'Function'").ThrowAsJavaScriptException();
+  }
+
+  // onobjectmessage
+  Napi::Value GUIFrame::Getonobjectmessage(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (this->onobjectmessage.IsEmpty()) return env.Null();
+    return this->onobjectmessage.Value().As<Napi::Function>();
+  }
+  void GUIFrame::Setonobjectmessage(const Napi::CallbackInfo& info, const Napi::Value& value) {
+    Napi::Env env = info.Env();
+    if (value.IsFunction()) this->onobjectmessage.Reset(value.As<Napi::Function>(), 1);
+    else if (value.IsNull()) this->onobjectmessage.Reset();
+    else Napi::TypeError::New(env, "Value be of type 'Function'").ThrowAsJavaScriptException();
   }
 
   // oncursorchange
@@ -367,7 +438,7 @@ namespace nodegui {
     Napi::Env env = info.Env();
     if (value.IsFunction()) this->oncursorchange.Reset(value.As<Napi::Function>(), 1);
     else if (value.IsNull()) this->oncursorchange.Reset();
-    else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
+    else Napi::TypeError::New(env, "Value must be of type 'Function'").ThrowAsJavaScriptException();
   }
 
   // onconsolemessage
@@ -380,7 +451,7 @@ namespace nodegui {
     Napi::Env env = info.Env();
     if (value.IsFunction()) this->onconsolemessage.Reset(value.As<Napi::Function>(), 1);
     else if (value.IsNull()) this->onconsolemessage.Reset();
-    else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
+    else Napi::TypeError::New(env, "Value must be of type 'Function'").ThrowAsJavaScriptException();
   }
 
   // onresize
@@ -393,7 +464,7 @@ namespace nodegui {
     Napi::Env env = info.Env();
     if (value.IsFunction()) this->onresize.Reset(value.As<Napi::Function>(), 1);
     else if (value.IsNull()) this->onresize.Reset();
-    else Napi::TypeError::New(env, "Argument 1 must be of type 'Function'").ThrowAsJavaScriptException();
+    else Napi::TypeError::New(env, "Value must be of type 'Function'").ThrowAsJavaScriptException();
   }
 
   Napi::Object GUIFrame::Initialize(Napi::Env env, Napi::Object exports) {
@@ -445,6 +516,10 @@ namespace nodegui {
         &GUIFrame::DispatchBinaryBuffer
       ),
       InstanceMethod(
+        "dispatchObject",
+        &GUIFrame::DispatchObject
+      ),
+      InstanceMethod(
         "dispatchMouseEvent",
         &GUIFrame::DispatchMouseEvent
       ),
@@ -464,6 +539,12 @@ namespace nodegui {
         "onbinarymessage",
         &GUIFrame::Getonbinarymessage,
         &GUIFrame::Setonbinarymessage,
+        napi_enumerable
+      ),
+      InstanceAccessor(
+        "onobjectmessage",
+        &GUIFrame::Getonobjectmessage,
+        &GUIFrame::Setonobjectmessage,
         napi_enumerable
       ),
       InstanceAccessor(

@@ -1,0 +1,27 @@
+<style>
+  .btn {
+    background: rgba(0,0,0,0.5);
+    font-family: "Segoe UI", "Roboto", arial, sans-serif;
+    border: 1px solid rgba(0,0,0,0.175);
+  }
+  .btn:active {
+    background: rgba(0,0,0,0.675);
+  }
+</style>
+
+<button class="btn" id="clickme">Click Me!</button>
+
+<script>
+// listen for incoming messages from Node
+// when we receive a "PING" message from Node,
+// then we answer back with a "PONG" after a short delay
+window.onobjectmessage = obj => {
+  console.log("<GUI>: Got Message: " + obj.message);
+  setTimeout(() => {
+    window.dispatchObject({ message: "PONG" });
+  }, 750);
+};
+clickme.onclick = e => {
+  window.dispatchObject({ message: "A Button was pressed" });
+};
+</script>

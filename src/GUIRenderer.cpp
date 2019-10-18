@@ -73,6 +73,10 @@ namespace nodegui {
     return frame()->OnDispatchBinaryBuffer(thisObject, info);
   }
 
+  ul::JSValue GUIRenderer::DispatchObject(const ul::JSObject& thisObject, const ul::JSArgs& info) {
+    return frame()->OnDispatchObject(thisObject, info);
+  }
+
   void GUIRenderer::Flush() {
     if (!use_offscreen_rendering_) return;
   }
