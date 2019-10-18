@@ -37,7 +37,8 @@ let result = VK_SUCCESS;
 let win = new VulkanWindow({
   width: 512,
   height: 512,
-  title: "NVK GUI"
+  title: "NVK GUI",
+  resizable: false
 });
 
 let gui = new azula.Window({
