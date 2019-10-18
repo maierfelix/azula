@@ -54,6 +54,7 @@ import azula from "azula";
       - [title](#windowprototypetitle)
       - [update](#windowprototypeupdate)
       - [flush](#windowprototypeflush)
+      - [shouldClose](#windowprototypeshouldclose)
     - [Loading](#loading)
       - [loadHTML](#windowprototypeloadhtml)
       - [loadFile](#windowprototypeloadfile)
@@ -118,6 +119,16 @@ This method should only be used in [OSR](#osr) mode. Calling this method execute
 
 ````js
 window.flush();
+````
+
+### Window.prototype.shouldClose
+
+| Type | Description |
+| :--- | :--- |
+| *Boolean* | A boolean, indicating if the window should be closed |
+
+````js
+window.shouldClose(); // true/false
 ````
 
 ## Loading
@@ -233,7 +244,6 @@ The following event types are available:
 | onmousedown | Simulating a mouse press action |
 | onmouseup | Simulating a mouse leave action |
 | onmousemove | Simulating a mouse move action |
-| onmousewheel | Simulating a mouse wheel action |
 
 ````js
 window.dispatchMouseEvent("onmousedown", 16, 32, 1); // press the left mouse button at 16:32
