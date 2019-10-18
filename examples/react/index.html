@@ -28,25 +28,42 @@
 
 <script type="text/javascript" src="https://unpkg.com/react/umd/react.development.js"></script>
 <script type="text/javascript" src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<script>
-
+<script type="text/babel">
   class TodoList extends React.Component {
     constructor(props) {
       super(props);
     }
+
     removeItem(item, i) {
       this.props.removeTodo(item, i);
     }
+
     render() {
-      return (React.createElement("div", null, React.createElement("ul", null, this.props.entries.map((todo, i) => {
-        return (React.createElement("li", null, todo, " ", React.createElement("button", {
-          onClick: () => {
-            this.removeItem(todo, i);
-          },
-          key: i
-        }, " ", "Delete", " ")));
-      }))));
+      return (
+        <div>
+          <ul>
+            {this.props.entries.map((todo, i) => {
+              return (
+                <li>
+                  {todo}
+                  {" "}
+                  <button
+                    onClick={() => {
+                      this.removeItem(todo, i);
+                    }}
+                    key={i}
+                  >
+                    {" "}Delete
+                    {" "}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
     }
   }
 
@@ -59,6 +76,7 @@
       this.addTask = this.addTask.bind(this);
       this.removeTask = this.removeTask.bind(this);
     }
+
     // setup the add handler
     addTask(event) {
       event.preventDefault();
@@ -67,12 +85,12 @@
       var newTaskInput = this.refs.newTask.value;
       // add new text value to task array
       taskArray.push(newTaskInput);
-      this.setState({
-        tasks: taskArray
-      });
+
+      this.setState({ tasks: taskArray });
       //clear form box after submit
       this.refs.newTask.value = "";
     }
+
     // setup the remove handler
     removeTask(name, i) {
       var tasks = this.state.tasks.slice();
@@ -83,34 +101,34 @@
         tasks
       });
     }
+
     render() {
-      return (React.createElement("div", null, React.createElement("form", {
-        onSubmit: this.addTask
-      }, React.createElement("input", {
-        type: "text",
-        placeholder: "Enter New Task",
-        ref: "newTask"
-      }), React.createElement("button", {
-        type: "submit"
-      }, "add")), React.createElement(TodoList, {
-        entries: this.state.tasks,
-        removeTodo: this.removeTask
-      })));
+      return (
+        <div>
+          <form onSubmit={this.addTask}>
+            <input type="text" placeholder="Enter New Task" ref="newTask" />
+            <button type="submit">add</button>
+          </form>
+          <TodoList entries={this.state.tasks} removeTodo={this.removeTask} />
+        </div>
+      );
     }
   }
 
   class App extends React.Component {
     render() {
       return (
-        React.createElement("div", {
-        className: "app container"
-      }, React.createElement("div", {
-        className: "title"
-      }, React.createElement("h1", null, "React Todo App"), React.createElement(Todos, null)))
+        <div className="app container">
+          <div className="title">
+            <h1>React Todo App</h1>
+            <Todos />
+          </div>
+        </div>
       );
     }
   }
 
-  const element = React.createElement(App, null);
-  ReactDOM.render(element, root);
+  const element = <App />;
+
+  ReactDOM.render(element, document.getElementById("root"));
 </script>
