@@ -4,8 +4,7 @@ import azula from "azula";
 let window = new azula.Window({
   width: 512,
   height: 512,
-  title: "azula",
-  useOffscreenRendering: false
+  title: "azula"
 });
 
 // forwards GUI console calls to node CLI
@@ -28,8 +27,6 @@ window.onresize = e => {
 };
 
 window.loadHTML(fs.readFileSync("./index.html", "utf8"));
-
-window.onbinarymessage(new ArrayBuffer(16), { kind: 420 });
 
 (function updateLoop() {
   if (window.shouldClose()) return;

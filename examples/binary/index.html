@@ -1,0 +1,35 @@
+<style>
+  .pixel {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    margin: 0 auto;
+    background-color: blue;
+  }
+</style>
+
+<script>
+window.onbinarymessage = (buffer, args) => {
+  let {width, height} = args;
+
+  // for each pixel we got sent
+  // turn it into a div pixel, which is pretty inefficient
+  // but there is no canvas api
+  let viewU8 = new Uint8Array(buffer);
+  for (let ii = 0; ii < width * height; ++ii) {
+    let x = (ii % width) | 0;
+    let y = (ii / width) | 0;
+    let r = viewU8[ii * 4 + 0];
+    let g = viewU8[ii * 4 + 1];
+    let b = viewU8[ii * 4 + 2];
+    let a = viewU8[ii * 4 + 3];
+    let pixel = document.createElement("div");
+    pixel.className = "pixel";
+    pixel.style.left = `${x}px`;
+    pixel.style.top = `${y}px`;
+    pixel.style.backgroundColor = `rgb(${r},${g},${b})`;
+    document.body.appendChild(pixel);
+  };
+
+};
+</script>
