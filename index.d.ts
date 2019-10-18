@@ -38,7 +38,7 @@ export interface ConsoleMessageEvent {
 }
 
 export class Window {
-  title: number;
+  title: string;
   width: number;
   height: number;
 
