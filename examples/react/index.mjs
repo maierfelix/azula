@@ -3,8 +3,8 @@ import azula from "azula";
 
 // create a window
 let window = new azula.Window({
-  width: 512,
-  height: 512,
+  width: 640,
+  height: 640,
   title: "azula"
 });
 

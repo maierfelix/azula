@@ -1,134 +1,514 @@
+<!-- Taken from: https://codepen.io/ariksasmita/pen/yqqzZW -->
 <style>
   body {
-    font-family: Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI","Oxygen","Ubuntu","Cantarell","Open Sans",sans-serif;
-    background-color: rgba(0,0,0,0.05);
-    ul {
-      padding: 0;
-      margin: 5px 0 5px;
-      li {
-        list-style: none;
-        margin: 10px 0 10px;
-      }
-    }
+    font-family: "Roboto", sans-serif;
+    background: #333;
+    overflow: auto;
   }
+
   button {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(0,0,0,0.175);
-    padding-left: 8px;
-    padding-right: 8px;
+    background: #ffffff;
+    color: #555555;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    border: none;
+    padding: 15px;
+    flex-grow: 1;
+    width: 50px;
   }
-  input {
-    border: 1px solid rgba(0,0,0,0.175);
-    padding-left: 8px;
-    padding-right: 8px;
+  button:focus {
+    outline: none;
+  }
+
+  .message {
+    text-align: center;
+    color: #ffffff;
+    margin-bottom: 30px;
+    min-width: 300px;
+    max-width: 40%;
+  }
+  .message h1 {
+    font-family: 'Roboto Slab';
+    font-size: 2rem;
+    margin-bottom: 20px;
+    line-height: 2.5rem;
+  }
+  .message p {
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+  }
+  .message strong {
+    font-weight: bold;
+  }
+
+  .container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calculator {
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: 0 0 50px #202020;
+  }
+
+  .display {
+    font-size: 3rem;
+    font-weight: 300;
+    padding: 20px 10px;
+    color: #ffffff;
+    background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+  }
+  .display-text {
+    flex-grow: 5;
+    text-align: right;
+  }
+  .display-overall {
+    font-size: 12px;
+    line-height: 10px;
+    height: 20px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .row {
+    display: flex;
+  }
+
+  .inputs {
+    display: flex;
+  }
+
+  .sides {
+    display: flex;
+    flex-direction: column;
+  }
+  .sides .ac {
+    flex-grow: 1;
+  }
+  .sides .equal {
+    flex-grow: 2;
+    color: #ffffff;
+    background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+  }
+
+  .operator button,
+  .sides button {
+    background: #f9f9f9;
+  }
+
+  .operator button.active {
+    background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+    color: #ffffff;
   }
 </style>
 
-<div id="root"></div>
+<div class="container">
+  <div class="calculator">
+    <div id="root"></div>
+  </div>
+</div>
 
 <script type="text/javascript" src="https://unpkg.com/react/umd/react.development.js"></script>
 <script type="text/javascript" src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
 <script type="text/babel">
-  class TodoList extends React.Component {
-    constructor(props) {
-      super(props);
-    }
+class CalcApp extends React.Component {
+  state = {
+    firstVal: '',
+    secondVal: '',
+    operator: '',
+    display: '0',
+  }
 
-    removeItem(item, i) {
-      this.props.removeTodo(item, i);
-    }
+  componentDidMount() {
+    const { keypressHandler } = this
+    document.addEventListener('keyup', ev => {
+      keypressHandler(ev)
+    })
+  }
 
-    render() {
-      return (
-        <div>
-          <ul>
-            {this.props.entries.map((todo, i) => {
-              return (
-                <li>
-                  {todo}
-                  {" "}
-                  <button
-                    onClick={() => {
-                      this.removeItem(todo, i);
-                    }}
-                    key={i}
-                  >
-                    {" "}Delete
-                    {" "}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      );
+  keypressHandler = ev => {
+    const {
+      setNumberValue,
+      setOperatorValue,
+      equalHandler,
+      allClear,
+      deleteChar,
+    } = this
+    const { 
+      operator,
+      secondVal,
+    } = this.state
+    const numRegex = /^([0-9]|\.)*$/g;
+    const opRegex =  /[+|\-|:|*]/g;
+    const eqRegex =  /(=)/g;
+    const delRegex = /(Backspace|Delete)/g;
+    const acRegex = /(Escape)/g;
+    const key = ev.key
+   
+    const isNumber = !!numRegex.exec(key)
+    const isOperator = !!opRegex.exec(key)
+    const isEqual = !!eqRegex.exec(key)
+    const isDel = !!delRegex.exec(key)
+    const isAc = !!acRegex.exec(key)
+    
+    if (key && isNumber) {
+      setNumberValue(key + '')
+    }
+    
+    if (key && isOperator) {
+      setOperatorValue(key + '')
+    }
+    
+    if (key && isEqual) {
+      equalHandler()
+    }
+    
+    if (key && isDel) {
+      deleteChar()
+    }
+    
+    if (key && isAc) {
+      allClear()
     }
   }
 
-  class Todos extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        tasks: []
-      };
-      this.addTask = this.addTask.bind(this);
-      this.removeTask = this.removeTask.bind(this);
-    }
-
-    // setup the add handler
-    addTask(event) {
-      event.preventDefault();
-      var taskArray = this.state.tasks;
-      // grab input text value
-      var newTaskInput = this.refs.newTask.value;
-      // add new text value to task array
-      taskArray.push(newTaskInput);
-
-      this.setState({ tasks: taskArray });
-      //clear form box after submit
-      this.refs.newTask.value = "";
-    }
-
-    // setup the remove handler
-    removeTask(name, i) {
-      var tasks = this.state.tasks.slice();
-      // remove task at index
-      tasks.splice(i, 1);
-      //update task array
+  resetState = resetAll => {
+    if (resetAll) {
       this.setState({
-        tasks
-      });
+        firstVal: '',
+        secondVal: '',
+        operator: '',
+        display: '0',
+     })
+    } else {
+      this.setState({
+        firstVal: '',
+        secondVal: '',
+        operator: '',
+     })
     }
-
-    render() {
-      return (
-        <div>
-          <form onSubmit={this.addTask}>
-            <input type="text" placeholder="Enter New Task" ref="newTask" />
-            <button type="submit">add</button>
-          </form>
-          <TodoList entries={this.state.tasks} removeTodo={this.removeTask} />
-        </div>
-      );
+  } 
+  
+  hasPoint = (value) => {
+    return value.indexOf('.') > -1
+  }
+  
+  setNumberValue = value => {
+    const {
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    const { 
+      fixNumberString,
+      setDisplay,
+    } = this
+    let total
+    
+    // if point is pressed, check if we already have it in current states
+    if (value === '.') {
+      if (!operator && !this.hasPoint(firstVal)) {      
+        total = fixNumberString(firstVal + value)
+        this.setState({
+          firstVal: total
+        })
+      }
+      if (!!operator && !this.hasPoint(secondVal)) {
+        total = fixNumberString(secondVal + value)
+        this.setState({
+          secondVal: total
+        })
+      }
+      if (total) {
+        setDisplay(total + '')
+      }
+      return
+    }
+    
+    // if input is a number, check if it's first or second number
+    if (!operator) {
+      total = fixNumberString(firstVal + value)
+      this.setState({
+        firstVal: total
+      })
+    } else {
+      total = fixNumberString(secondVal + value)
+      this.setState({
+        secondVal: total
+      })
+    }
+    setDisplay(total + '')
+  }
+  
+  getOverall = () => {
+    const { 
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    return firstVal + ' ' + operator + ' ' + secondVal
+  }
+  
+  setDisplay = value => {
+    const { 
+      firstVal,
+      secondVal,
+    } = this.state
+    
+    this.setState({
+      display: value,
+    })
+  }
+  
+  getCurrentTargetValue = () => {
+    const {
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    return !operator ? firstVal : secondVal
+  }
+  
+  numberClickHandler = (e) => {
+    const value = e.target.innerHTML
+    if (value) {
+      this.setNumberValue(value)
     }
   }
-
-  class App extends React.Component {
-    render() {
-      return (
-        <div className="app container">
-          <div className="title">
-            <h1>React Todo App</h1>
-            <Todos />
-          </div>
-        </div>
-      );
+  
+  setOperatorValue = operatorInput => {
+    const { 
+      firstVal,
+      secondVal,
+      operator,
+      display,
+    } = this.state
+    const { 
+      fixNumberString,
+      calculate,
+      setDisplay,
+    } = this
+    const fixedNumber = fixNumberString(firstVal, false)
+    
+    if (firstVal && !secondVal) {
+      this.setState({
+        operator: operatorInput,
+        display: fixedNumber,
+      })
+    } else if (firstVal && operator && secondVal) {
+     const total = calculate()
+     this.setState({
+       operator: operatorInput,
+       firstVal: total + '',
+       secondVal: '',
+     })
+     setDisplay(total + '')
+    } else {
+      this.setState({
+        operator: operatorInput,
+        firstVal: fixNumberString(display, false),
+      })
     }
   }
+  
+  operatorClickHandler = (e) => {
+    const { setOperatorValue } = this
+    const operatorInput = e.target.innerHTML
+    
+    setOperatorValue(operatorInput)
+  }
+  
+  allClear = () => {
+    this.resetState(true)
+  }
+  
+  deleteChar = () => {
+    const {
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    const opRegex =  /[+|\-|:|*]/g;
+    
+    if (!operator) {
+      const newVal = firstVal.slice(0, -1)
+      this.setState({
+        firstVal: newVal,
+        display: newVal ? newVal : '0',
+      })
+    } else if (operator && !secondVal) {
+      this.setState({
+        display: firstVal,
+        operator: '',
+      })
+    } else {
+      const newVal = secondVal.slice(0, -1)
+      this.setState({
+        secondVal: newVal,
+        display: newVal ? newVal : '0',
+      })
+    }
+  }
+  
+  removeZeroAtStart = value => {
+    return value.indexOf('0') === 0 ? value.substring(1) : value
+  }
+  
+  fixNumberString = (value, finalize = false) => {
+    // if input has hanging point e.g. '0.'/'1.', add trailing zero
+    // should only run when moving to second value / begin calculation
+    if (finalize && value.indexOf('.') === value.length - 1 && value.length > 1) { 
+      return value + '0'
+    }
+    // if value has zero prefix but not a decimal value, e.g. '01'/'03', remove zero
+    if (value.indexOf('0') === 0 && !value.indexOf('0.') === 0) {
+      return value.substring(1)
+    }
+    // if value is a first point input '.', add zero prefix
+    if (value.indexOf('.') === 0 && value.length === 1) {
+      return '0.'
+    }
+    if (!value) {
+      return '0'
+    }
+    return value
+  }
+  
+  calculate = () => {
+    const {
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    const {
+      fixNumberString,
+    } = this
+    
+    const vfirstVal = fixNumberString(firstVal, true)
+    const vsecondVal = fixNumberString(secondVal, true)
+    let total = '0';
+    
+    switch (operator) {
+      case '-' :
+        total = parseFloat(vfirstVal) - parseFloat(vsecondVal)
+        break;
+      case '*':
+        total = parseFloat(vfirstVal) * parseFloat(vsecondVal)
+        break;
+      case ':' :
+        total = parseFloat(vfirstVal) / parseFloat(vsecondVal)
+        break;
+      case '+' :
+      default:
+        total = parseFloat(vfirstVal) + parseFloat(vsecondVal)
+        break;
+    }
+    
+    return total.toLocaleString()
+  }
+  
+  equalHandler = () => {
+    const {
+      firstVal,
+      secondVal,
+      operator,
+    } = this.state
+    const {
+      setDisplay,
+      resetState,
+      calculate,
+    } = this
+    
+    if (firstVal && secondVal && operator) {
+      let total = calculate()
+      setDisplay(total + '')
+      resetState()
+    }
+  }
+  
+  render() {
+    const { 
+      display,
+      operator,
+    } = this.state
+    const {
+      operatorClickHandler,
+      numberClickHandler,
+      deleteChar,
+      allClear,
+      equalHandler,
+      getOverall,
+    } = this
+    const activeOperator = name => {
+      return operator === name ? 'active' : ''
+    }
+    return (
+      <div>
+        <div className="display">
+          <p className="display-overall">{ getOverall().trim() }</p>
+          <p className="display-text">{ display }</p>
+        </div>
+        <div className="inputs">
+          <div className="column main">
+            <div className="operator">
+              <div className="row">
+                <button 
+                  className={activeOperator('+')}
+                  onClick={operatorClickHandler}>+</button>
+                <button 
+                  className={activeOperator('-')}
+                  onClick={operatorClickHandler}>-</button>
+                <button 
+                  className={activeOperator(':')}
+                  onClick={operatorClickHandler}>:</button>
+                <button 
+                  className={activeOperator('*')}
+                  onClick={operatorClickHandler}>*</button>
+              </div>
+            </div> { /* operator */ }
+            <div className="numbers">
+              <div className="row">
+                <button onClick={numberClickHandler}>1</button>
+                <button onClick={numberClickHandler}>2</button>
+                <button onClick={numberClickHandler}>3</button>
+              </div>
+              <div className="row">
+                <button onClick={numberClickHandler}>4</button>
+                <button onClick={numberClickHandler}>5</button>
+                <button onClick={numberClickHandler}>6</button>
+              </div>
+              <div className="row">
+                <button onClick={numberClickHandler}>7</button>
+                <button onClick={numberClickHandler}>8</button>
+                <button onClick={numberClickHandler}>9</button>
+              </div>
+              <div className="row">
+                <button onClick={numberClickHandler}>.</button>
+                <button onClick={numberClickHandler}>0</button>
+                <button onClick={deleteChar}>C</button>
+              </div>
+            </div> { /* numbers */ }
+          </div> { /* main */ }
+          <div className="column sides">
+            <button className="ac" onClick={allClear}>AC</button>
+            <button className="equal" onClick={equalHandler}>=</button>
+          </div> { /* sides */ }
+        </div> { /* inputs */ }
+      </div>
+    )
+  }
+}
 
-  const element = <App />;
+ReactDOM.render(
+  <CalcApp/>,
+  document.getElementById('root')
+);
 
-  ReactDOM.render(element, document.getElementById("root"));
 </script>

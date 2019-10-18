@@ -1,0 +1,106 @@
+body {
+  font-family: "Roboto", sans-serif;
+  height: 100vh;
+  min-height: 800px;
+  background: #333;
+  overflow: auto;
+}
+
+button {
+  background: #ffffff;
+  color: #555555;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  border: none;
+  padding: 15px;
+  flex-grow: 1;
+  width: 50px;
+}
+button:focus {
+  outline: none;
+}
+
+.message {
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 30px;
+  min-width: 300px;
+  max-width: 40%;
+}
+.message h1 {
+  font-family: 'Roboto Slab';
+  font-size: 2rem;
+  margin-bottom: 20px;
+  line-height: 2.5rem;
+}
+.message p {
+  font-size: 0.8rem;
+  line-height: 1.2rem;
+}
+.message strong {
+  font-weight: bold;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.calculator {
+  border-radius: 7px;
+  overflow: hidden;
+  box-shadow: 0 0 50px #202020;
+}
+
+.display {
+  font-size: 3rem;
+  font-weight: 300;
+  padding: 20px 10px;
+  color: #ffffff;
+  background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+}
+.display-text {
+  flex-grow: 5;
+  text-align: right;
+}
+.display-overall {
+  font-size: 12px;
+  line-height: 10px;
+  height: 20px;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.row {
+  display: flex;
+}
+
+.inputs {
+  display: flex;
+}
+
+.sides {
+  display: flex;
+  flex-direction: column;
+}
+.sides .ac {
+  flex-grow: 1;
+}
+.sides .equal {
+  flex-grow: 2;
+  color: #ffffff;
+  background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+}
+
+.operator button,
+.sides button {
+  background: #f9f9f9;
+}
+
+.operator button.active {
+  background: linear-gradient(0.35turn, #FBAB7E, #F7CE68);
+  color: #ffffff;
+}
