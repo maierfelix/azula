@@ -77,6 +77,9 @@ import azula from "azula";
       - [dispatchMouseEvent](#windowprototypedispatchmouseevent)
       - [dispatchKeyEvent](#windowprototypedispatchkeyevent)
       - [dispatchScrollEvent](#windowprototypedispatchscrollevent)
+    - [Object Messaging](#object-messaging)
+      - [dispatchObject](#windowprototypedispatchobject)
+      - [onobjectmessage](#windowprototypeonobjectmessage)
     - [Binary Messaging](#binary-messaging)
       - [dispatchBinaryBuffer](#windowprototypedispatchbinarybuffer)
       - [onbinarymessage](#windowprototypeonbinarymessage)
@@ -324,13 +327,51 @@ window.dispatchScrollEvent("onmousewheel", 0, 1); // scroll upwards, vertically 
 window.dispatchScrollEvent("onmousewheel", -1, 0); // scroll downwards, horizontally by -1
 ````
 
+## Object Messaging
+
+The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https://developer.apple.com/documentation/javascriptcore) engine. The JavaScript engine of Node is different to the one used in *azula*, so we cannot directly exchange data. The Object Messaging System allows to send Object between both engines.
+
+Note that to be sent Objects should kept small, as behind the scenes, they get serialized.
+
+### Window.prototype.dispatchObject
+
+An equivalent method is available in the GUI. See [this](https://github.com/maierfelix/azula/tree/master/examples/messaging) example as a reference.
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| object | *Object* | The Object to send to the GUI |
+
+````js
+window.dispatchObject({ message: "PING" });
+````
+
+### Window.prototype.onobjectmessage
+
+An equivalent method is available in the GUI. See [this](https://github.com/maierfelix/azula/tree/master/examples/messaging) example as a reference.
+
+| Type | Description |
+| :--- | :--- |
+| *Function* | The function to call when an object message was sent from the GUI |
+
+The callback's Event parameter has the following structure:
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| object | *Object* | The Object sent from the GUI |
+
+````js
+window.onobjectmessage = object => {
+  console.log(object);
+};
+````
+
 ## Binary Messaging
 
 The underlying JavaScript engine of *azula* is WebKit's [JavaScriptCore](https://developer.apple.com/documentation/javascriptcore) engine. The JavaScript engine of Node is different to the one used in *azula*, so we cannot directly exchange data. The Binary Messaging System allows to efficiently pass [ArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) between both engines. Even though the engines are different, ArrayBuffers can be exchanged without any copying, meaning they don't have any overhead.
 
 ### Window.prototype.dispatchBinaryBuffer
 
-An equivalent method is available in the GUI.
+An equivalent method is available in the GUI. See [this](https://github.com/maierfelix/azula/tree/master/examples/binary) example as a reference.
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a referenced buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
@@ -347,7 +388,7 @@ window.dispatchBinaryBuffer(new ArrayBuffer(16), { kind: "SOME_DATA" });
 
 ### Window.prototype.onbinarymessage
 
-An equivalent method is available in the GUI.
+An equivalent method is available in the GUI. See [this](https://github.com/maierfelix/azula/tree/master/examples/binary) example as a reference.
 
 The *binarymessage* system should only be used when sending large data between Node and *azula*. The `buffer` argument is a referenced buffer, which means there is no overhead when sending it between Node and *azula* as the data is effectively referenced.
 
@@ -385,6 +426,8 @@ let handle = window.getSharedHandleD3D11();
 ````
 
 ## OSR
+
+See [this](https://github.com/maierfelix/azula/tree/master/examples/OSR) example as a reference.
 
 *azula* supports running in OSR (*Offscreen rendering*) mode. This means, that instead of creating a window, an invisible texture gets used and rendered into. This texture can then be imported into a 3D engine for example. Another common use case would be, to display the texture in a VR environment.
 
