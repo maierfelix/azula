@@ -52,6 +52,8 @@ import azula from "azula";
   * [Window](#window)
     - [General](#general)
       - [title](#windowprototypetitle)
+      - [width](#windowprototypewidth)
+      - [height](#windowprototypeheight)
       - [update](#windowprototypeupdate)
       - [flush](#windowprototypeflush)
       - [shouldClose](#windowprototypeshouldclose)
@@ -103,6 +105,28 @@ let window = new azula.Window({
 ````js
 window.title = "My App";
 window.title; // "My App"
+````
+
+### Window.prototype.width
+
+| Type | Description |
+| :--- | :--- |
+| *Number* | A getter/setter allowing to retrieve or update the width of the window |
+
+````js
+window.width = 640;
+window.width; // 640
+````
+
+### Window.prototype.height
+
+| Type | Description |
+| :--- | :--- |
+| *Number* | A getter/setter allowing to retrieve or update the height of the window |
+
+````js
+window.height = 480;
+window.height; // 480
 ````
 
 ### Window.prototype.update
