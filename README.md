@@ -4,7 +4,7 @@
   </a>
   <br/>
   <br/>
-  <i>Azula</i>, a lightweight GPU accelerated HTML GUI for Node
+  <i>azula</i>, a lightweight GPU accelerated HTML GUI for Node
   <br/>
   <br/>
   <a href="https://www.npmjs.com/package/azula">
