@@ -42,7 +42,7 @@ export class Window {
   width: number;
   height: number;
 
-  constructor (options: WindowOptions);
+  constructor (options?: WindowOptions);
 
   update (): void;
   flush (): void;
@@ -58,6 +58,9 @@ export class Window {
   dispatchMouseEvent (type: MouseEventType, x: number, y: number, button: number): void;
   dispatchKeyEvent (type: KeyEventType, keyCode: number): void;
   dispatchScrollEvent (type: ScrollEventType, deltaX: number, deltaY: number): void;
+
+  dispatchObject (object: object): void;
+  onobjectmessage: (object: object) => any;
 
   dispatchBinaryBuffer (buffer: ArrayBuffer, args?: object): void;
   onbinarymessage: (buffer: ArrayBuffer, args?: object) => any;
