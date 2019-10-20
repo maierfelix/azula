@@ -59,6 +59,9 @@ export class Window {
   dispatchKeyEvent (type: KeyEventType, keyCode: number): void;
   dispatchScrollEvent (type: ScrollEventType, deltaX: number, deltaY: number): void;
 
+  dispatchObject (object: object): void;
+  onobjectmessage: (object: object) => any;
+
   dispatchBinaryBuffer (buffer: ArrayBuffer, args?: object): void;
   onbinarymessage: (buffer: ArrayBuffer, args?: object) => any;
 
