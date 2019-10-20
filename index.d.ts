@@ -42,7 +42,7 @@ export class Window {
   width: number;
   height: number;
 
-  constructor (options: WindowOptions);
+  constructor (options?: WindowOptions);
 
   update (): void;
   flush (): void;
